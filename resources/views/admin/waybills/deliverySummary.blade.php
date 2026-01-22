@@ -103,8 +103,10 @@ update buttons & table field according instructions
             <td>{{ $waybill->recipient->address }}</td>
             <td>
                 {{-- {{ $waybill->driver->name ?? 'Non Assigné' }} --}}
-                {{ $waybill->driver ? $waybill->driver->name . ' (ID: ' . $waybill->driver->id . ')' : 'Non Assigné' }}
-
+                {{ $waybill->driver_id
+                    ? ($waybill->driver_id == 99 ? '01' : ($waybill->driver_id == 27 ? '20' : $waybill->driver_id))
+                    : 'Non Assigné'
+                }}
             </td>
             <td>
                 <a href="{{ url('admin/waybill/'. $waybill->id) }}" class="btn btn-sm btn-primary">

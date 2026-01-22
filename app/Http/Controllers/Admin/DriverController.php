@@ -104,10 +104,10 @@ class DriverController extends Controller
         // ->orderBy('id', 'DESC')
         ->orderBy('driver_assign_time', 'ASC')  // ASC = Ascending
         ->get();*/
-        
-    
+
+
     // new
-    
+
     // $waybills = Waybill::with(['recipient', 'shipper'])
     // ->where('driver_id', $id)
     // ->when($is_mira == 1, function ($query) use ($currentDate) {
@@ -121,8 +121,8 @@ class DriverController extends Controller
     //         ->orderBy('drop_time', 'ASC');
     // })
     // ->get();
-    
-    
+
+
     $waybills = Waybill::with(['recipient', 'shipper'])
     ->where('driver_id', $id)
     ->where(function ($query) use ($currentDate) {
@@ -141,7 +141,7 @@ class DriverController extends Controller
         });
     })
     ->orderByRaw("
-        CASE 
+        CASE
             WHEN is_mira = 1 THEN driver_assign_time
             ELSE drop_time
         END ASC
@@ -197,7 +197,7 @@ public function getDriverWaybills(Request $request, $id)
         ->whereDate('driver_assign_time', '=', $date)
         ->orderBy('id', 'DESC')
         ->get();*/
-        
+
     // new
     $waybills = Waybill::with(['recipient', 'shipper'])
     ->where('driver_id', $id)
@@ -217,7 +217,7 @@ public function getDriverWaybills(Request $request, $id)
         });
     })
     ->orderByRaw("
-        CASE 
+        CASE
             WHEN is_mira = 1 THEN driver_assign_time
             ELSE drop_time
         END ASC
@@ -592,21 +592,21 @@ public function emailReport(Request $request){
     $message->to('ali2015333061@gmail.com')
             ->subject('Simple HTML Email');
 });*/
-    
+
     // $waybillsToSend = [28212, 27938, 28210];
     // $waybillsToSend = [28238];
     // test mail
     // $waybillsToSend = [28325, 28309, 28308, 28307, 28306, 28299, 28298, 28281, 28279, 28276, 28267, 28266];
     // $waybillsToSend = [29267];//error 28298
-    
+
     // $waybillsToSend = ['29335', '29334', '29337', '29331', '29343', '29333', '29329', '29308', '29319', '29365', '29366', '29341', '29350', '29373', '29267', '29368'];//error 28298
-    
-    
+
+
     $waybillsToSend = $request->input('reportData');
     Log::info('WaybillsToSend input driver email:', $waybillsToSend);
     if(!empty($waybillsToSend)) {
-        $htmlContent = "Bonjour Courrier Subito presto,<br>Le chauffeur a terminé sa journée et a transmis son bordereau de livraison.";
-                
+        $htmlContent = "Bonjour Courrier Subito presto,<br>Le chauffeur a terminÃ© sa journÃ©e et a transmis son bordereau de livraison.";
+
                     // $pdf = $this->emailSummaryPdf(Waybill::with('user.client', 'shipper', 'recipient')->whereIn('id', $waybillsToSend)->get(), true, 1, false);
                     // Log::info('PDF generated successfully', ['waybills' => $waybillsToSend]);
 
@@ -617,15 +617,15 @@ public function emailReport(Request $request){
                     //         ->get(),
                     //     true, 1, false
                     // );
-                    
-                    $waybills = Waybill::with('user.client', 'shipper', 'recipient')
+
+                    $waybills = Waybill::with('user.client', 'shipper', 'recipient', 'driver')
                     ->whereIn('id', $waybillsToSend)
                     ->get()
                     ->sortBy(function ($waybill) use ($waybillsToSend) {
                         return array_search($waybill->id, $waybillsToSend);
                     })
                     ->values(); // reindex to ensure clean array
-                
+
                 // Log the reordered IDs to verify
                 Log::info('Reordered waybill IDs driver email:', $waybills->pluck('id')->toArray());
                     $data = $this->emailPdf($waybills, true, 1, false);
@@ -637,27 +637,27 @@ public function emailReport(Request $request){
                     Log::info("PDF size: " . round($pdfSizeBytes / (1024 * 1024), 2) . " MB");
                     Log::info("PDF link: $pdfUrl");
                     Log::info('PDF generated successfully', ['waybills' => $waybillsToSend]);
-                    
+
                     /*try {Mail::html("", function ($message) use ($pdf) {
                         // Log values for debugging
-                        
+
                         $message->to('ali2015333061@gmail.com')
                         // $message->to('danybergeron@courriersubitopresto.com')
                         // ->bcc('ali2015333061@gmail.com')
                             // ->bcc('widmaertelisma@gmail.com')
                             // $message->to('ali2015333061@gmail.com')
                                 // ->bcc('widmaertelisma@gmail.com')
-                            ->subject(' Fin de journée du chauffeur. Bordereau en pièce jointe ' . \Auth::user()->name)
+                            ->subject(' Fin de journï¿½e du chauffeur. Bordereau en piï¿½ce jointe ' . \Auth::user()->name)
                             ->attachData($pdf, 'Waybills.pdf', [
                                 'mime' => 'application/pdf',
                             ]);
-                            
+
                     });*/
                     /*try{Mail::html([], [], function ($message) use ($pdfContent, $pdfSizeBytes, $maxSizeBytes,$pdfUrl) {
-                    
+
                     $message->to('ali2015333061@gmail.com')
-                        ->subject('Fin de journée du chauffeur. Bordereau en pièce jointe ' . \Auth::user()->name);
-                
+                        ->subject('Fin de journï¿½e du chauffeur. Bordereau en piï¿½ce jointe ' . \Auth::user()->name);
+
                     // Attach PDF only if <= 20MB
                     // if ($pdfSizeBytes <= $maxSizeBytes) {
                     //     $message->attachData($pdfContent, 'Waybills.pdf', [
@@ -679,16 +679,16 @@ public function emailReport(Request $request){
                         // Minimal fallback body (optional)
                         $message->setBody('Fichier PDF joint.', 'text/plain');
                 } else {
-                    $message->setBody('Téléchargez le fichier ici : ' . $pdfUrl, 'text/plain');
+                    $message->setBody('Tï¿½lï¿½chargez le fichier ici : ' . $pdfUrl, 'text/plain');
                 }
                 });*/
-                
+
                 try {
     Mail::send([], [], function ($message) use ($pdfContent, $pdfSizeBytes, $maxSizeBytes, $pdfUrl) {
         // $message->to('ali2015333061@gmail.com')
         $message->to('danybergeron@courriersubitopresto.com')
                 ->bcc('ali2015333061@gmail.com')
-                ->subject('Fin de journée du chauffeur. Bordereau en pièce jointe ' . (\Auth::check() ? \Auth::user()->name : 'Utilisateur inconnu'));
+                ->subject('Fin de journÃ©e du chauffeur. Bordereau en piÃ©ce jointe ' . (\Auth::check() ? \Auth::user()->name : 'Utilisateur inconnu'));
 
         if ($pdfSizeBytes <= $maxSizeBytes) {
             $message->attachData($pdfContent, 'Waybills.pdf', [
@@ -697,8 +697,8 @@ public function emailReport(Request $request){
 
             $message->setBody('Fichier PDF joint.', 'text/plain'); // Optional plain fallback
         } else {
-            // $message->setBody('Téléchargez le fichier ici : ' . $pdfUrl, 'text/plain');
-            $message->setBody('Téléchargez le fichier ici : <a href="' . $pdfUrl . '">' . $pdfUrl . '</a>', 'text/html');
+            // $message->setBody('Tï¿½lï¿½chargez le fichier ici : ' . $pdfUrl, 'text/plain');
+            $message->setBody('TÃ©lÃ©chargez le fichier ici : <a href="' . $pdfUrl . '">' . $pdfUrl . '</a>', 'text/html');
 
 
         }
@@ -755,7 +755,7 @@ public function emailSummaryPdf($waybills, $return = false, $copies = 1, $print 
 
         return $return ? $pdf->Output('', 'S') : response($pdf->Output('', 'S'))->header('Content-Type', 'application/pdf');
     }
-    
+
     public function emailPdf_old($waybills, $return = false, $copies = 1, $print = true)
     {
         if($waybills instanceof Waybill)
@@ -802,7 +802,7 @@ public function emailSummaryPdf($waybills, $return = false, $copies = 1, $print 
 
         return $return ? $pdf->Output('', 'S') : response($pdf->Output('', 'S'))->header('Content-Type', 'application/pdf');
     }
-    
+
     public function emailPdf($waybills, $return = false, $copies = 1, $print = true)
     {
         // if (!$user) {
@@ -863,7 +863,7 @@ public function emailSummaryPdf($waybills, $return = false, $copies = 1, $print 
     // old working
     // $fileName = 'waybills_' . $date . '.pdf';
     $unique = uniqid();
-    $fileName = 'waybills_' . $unique . '_' . $date . '.pdf'; 
+    $fileName = 'waybills_' . $unique . '_' . $date . '.pdf';
     // now()->format('Y-m-d_H-i-s') . '.pdf';
     $pdfContent = $pdf->Output('', 'S');
     Storage::disk('public')->put('pdfs/' . $fileName, $pdfContent);
@@ -875,7 +875,7 @@ public function emailSummaryPdf($waybills, $return = false, $copies = 1, $print 
     // return $return
     //     ? $pdfContent
     //     : response($pdfContent)->header('Content-Type', 'application/pdf');
-    
+
     return [
     'pdf' => $pdfContent,
     'url' => $pdfUrl,

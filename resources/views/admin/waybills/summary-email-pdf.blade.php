@@ -318,7 +318,7 @@
           </tr>
           <tr>
           <td style="padding-top: 5px; padding-bottom: 10px;">
-             <p>Chauffeur: {{$driver_id ? $driver_id : '________________________________'}}  Date: {{ $drop_time ? date('m-d-Y', strtotime($drop_time)) : '__________' }}</p>
+             <p>Chauffeur: {{ $driver_id ? ($driver_id == 99 ? '01' : ($driver_id == 27 ? '20' : $driver_id)) : '________________________________' }}  Date: {{ $drop_time ? date('m-d-Y', strtotime($drop_time)) : '__________' }}</p>
               {{--<p style="margin: 0;">Date: {{ $drop_time ? date('m-d-Y', strtotime($drop_time)) : '__________' }}</p>--}}
            </td>
           </tr>
