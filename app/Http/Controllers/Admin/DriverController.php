@@ -605,7 +605,7 @@ public function emailReport(Request $request){
     $waybillsToSend = $request->input('reportData');
     Log::info('WaybillsToSend input driver email:', $waybillsToSend);
     if(!empty($waybillsToSend)) {
-        $htmlContent = "Bonjour Courrier Subito presto,<br>Le chauffeur a terminé sa journée et a transmis son bordereau de livraison.";
+        $htmlContent = "Bonjour Courrier Subito presto,<br>Le chauffeur a terminï¿½ sa journï¿½e et a transmis son bordereau de livraison.";
                 
                     // $pdf = $this->emailSummaryPdf(Waybill::with('user.client', 'shipper', 'recipient')->whereIn('id', $waybillsToSend)->get(), true, 1, false);
                     // Log::info('PDF generated successfully', ['waybills' => $waybillsToSend]);
@@ -618,7 +618,7 @@ public function emailReport(Request $request){
                     //     true, 1, false
                     // );
                     
-                    $waybills = Waybill::with('user.client', 'shipper', 'recipient')
+                    $waybills = Waybill::with('user.client', 'shipper', 'recipient', 'driver')
                     ->whereIn('id', $waybillsToSend)
                     ->get()
                     ->sortBy(function ($waybill) use ($waybillsToSend) {
@@ -647,7 +647,7 @@ public function emailReport(Request $request){
                             // ->bcc('widmaertelisma@gmail.com')
                             // $message->to('ali2015333061@gmail.com')
                                 // ->bcc('widmaertelisma@gmail.com')
-                            ->subject(' Fin de journée du chauffeur. Bordereau en pièce jointe ' . \Auth::user()->name)
+                            ->subject(' Fin de journï¿½e du chauffeur. Bordereau en piï¿½ce jointe ' . \Auth::user()->name)
                             ->attachData($pdf, 'Waybills.pdf', [
                                 'mime' => 'application/pdf',
                             ]);
@@ -656,7 +656,7 @@ public function emailReport(Request $request){
                     /*try{Mail::html([], [], function ($message) use ($pdfContent, $pdfSizeBytes, $maxSizeBytes,$pdfUrl) {
                     
                     $message->to('ali2015333061@gmail.com')
-                        ->subject('Fin de journée du chauffeur. Bordereau en pièce jointe ' . \Auth::user()->name);
+                        ->subject('Fin de journï¿½e du chauffeur. Bordereau en piï¿½ce jointe ' . \Auth::user()->name);
                 
                     // Attach PDF only if <= 20MB
                     // if ($pdfSizeBytes <= $maxSizeBytes) {
@@ -679,7 +679,7 @@ public function emailReport(Request $request){
                         // Minimal fallback body (optional)
                         $message->setBody('Fichier PDF joint.', 'text/plain');
                 } else {
-                    $message->setBody('Téléchargez le fichier ici : ' . $pdfUrl, 'text/plain');
+                    $message->setBody('Tï¿½lï¿½chargez le fichier ici : ' . $pdfUrl, 'text/plain');
                 }
                 });*/
                 
@@ -688,7 +688,7 @@ public function emailReport(Request $request){
         // $message->to('ali2015333061@gmail.com')
         $message->to('danybergeron@courriersubitopresto.com')
                 ->bcc('ali2015333061@gmail.com')
-                ->subject('Fin de journée du chauffeur. Bordereau en pièce jointe ' . (\Auth::check() ? \Auth::user()->name : 'Utilisateur inconnu'));
+                ->subject('Fin de journï¿½e du chauffeur. Bordereau en piï¿½ce jointe ' . (\Auth::check() ? \Auth::user()->name : 'Utilisateur inconnu'));
 
         if ($pdfSizeBytes <= $maxSizeBytes) {
             $message->attachData($pdfContent, 'Waybills.pdf', [
@@ -697,8 +697,8 @@ public function emailReport(Request $request){
 
             $message->setBody('Fichier PDF joint.', 'text/plain'); // Optional plain fallback
         } else {
-            // $message->setBody('Téléchargez le fichier ici : ' . $pdfUrl, 'text/plain');
-            $message->setBody('Téléchargez le fichier ici : <a href="' . $pdfUrl . '">' . $pdfUrl . '</a>', 'text/html');
+            // $message->setBody('Tï¿½lï¿½chargez le fichier ici : ' . $pdfUrl, 'text/plain');
+            $message->setBody('Tï¿½lï¿½chargez le fichier ici : <a href="' . $pdfUrl . '">' . $pdfUrl . '</a>', 'text/html');
 
 
         }
