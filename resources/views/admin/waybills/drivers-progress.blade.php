@@ -2659,7 +2659,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                     <td contenteditable="false">${formatCreationHour?formatCreationHour: "&nbsp;"}</td>
                                     <td class="editable" data-table="waybills" data-column="status" data-id=${note.id}>${statusTranslated.toUpperCase()}</td>
                                     {{-- <td >${driver[driverId]? driver[driverId] : ""} ${driverId? driverId : "&nbsp;" } </td> --}}
-                                    <td>${driverId? driverId : "&nbsp;" } </td>
+                                    <td>${driverId ? (driverId == 99 ? '01' : (driverId == 27 ? '20' : driverId)) : "&nbsp;" } </td>
                                 </tr>
                                 <tr>
 
