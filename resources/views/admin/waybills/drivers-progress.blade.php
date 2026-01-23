@@ -909,7 +909,7 @@ $Driver_64 =  getDriverInfo($drivers,64);
                 {{-- <button id="Dany">Dany</button> --}}
             </div>
             </div>
-            <div class="sub-menu-item" id="Eric 10">{{$Driver_10['name']}} {{ $Driver_10['id'] == 99 ? '01' : ($Driver_10['id'] == 27 ? '20' : $Driver_10['id']) }}
+            <div class="sub-menu-item" id="Eric 10">{{$Driver_10['name']}} {{ $Driver_10['id']}}
                 <div class="sub-menu1">
                     <button id="E10Mira">Mira</button>
                     <button id="E10Donner">Donner</button>
@@ -935,7 +935,7 @@ $Driver_64 =  getDriverInfo($drivers,64);
                     {{-- <button id="Dany">Dany</button> --}}
                 </div>
             </div>
-            <div class="sub-menu-item" id="André 43">{{$Driver_43['name']}} {{ $Driver_43['id'] == 99 ? '01' : ($Driver_43['id'] == 27 ? '20' : $Driver_43['id']) }}
+            <div class="sub-menu-item" id="André 43">{{$Driver_43['name']}} {{ $Driver_43['id']}}
                 <div class="sub-menu1">
                     <button id="43Mira">Mira</button>
                     <button id="43Donner">Donner</button>
@@ -948,7 +948,7 @@ $Driver_64 =  getDriverInfo($drivers,64);
                     {{-- <button id="Dany">Dany</button> --}}
                 </div>
                 </div>
-            <div class="sub-menu-item" id="Raymond 49">{{$Driver_49['name']}} {{ $Driver_49['id'] == 99 ? '01' : ($Driver_49['id'] == 27 ? '20' : $Driver_49['id']) }}
+            <div class="sub-menu-item" id="Raymond 49">{{$Driver_49['name']}} {{ $Driver_49['id']}}
                 <div class="sub-menu1">
                     <button id="49Mira">Mira</button>
                     <button id="49Donner">Donner</button>
@@ -961,7 +961,7 @@ $Driver_64 =  getDriverInfo($drivers,64);
                     {{-- <button id="Dany">Dany</button> --}}
                 </div>
             </div>
-            <div class="sub-menu-item" id="Arnaud 51">{{$Driver_51['name']}} {{ $Driver_51['id'] == 99 ? '01' : ($Driver_51['id'] == 27 ? '20' : $Driver_51['id']) }}
+            <div class="sub-menu-item" id="Arnaud 51">{{$Driver_51['name']}} {{ $Driver_51['id']}}
                 {{-- <button id="Arnaud 52">Arnaud 52</button> --}}
                 <div class="sub-menu1">
                     <button id="51Mira">Mira</button>
@@ -975,7 +975,7 @@ $Driver_64 =  getDriverInfo($drivers,64);
                     {{-- <button id="Dany">Dany</button> --}}
                 </div>
             </div>
-            <div class="sub-menu-item" id="Achraf 55">{{$Driver_55['name']}} {{ $Driver_55['id'] == 99 ? '01' : ($Driver_55['id'] == 27 ? '20' : $Driver_55['id']) }}
+            <div class="sub-menu-item" id="Achraf 55">{{$Driver_55['name']}} {{ $Driver_55['id']}}
                 <div class="sub-menu1">
                     <button id="55Mira">Mira</button>
                     <button id="55Donner">Donner</button>
@@ -988,7 +988,7 @@ $Driver_64 =  getDriverInfo($drivers,64);
                     {{-- <button id="Dany">Dany</button> --}}
                 </div>
             </div>
-            <div class="sub-menu-item" id="Sylvain 64">{{$Driver_64['name']}} {{ $Driver_64['id'] == 99 ? '01' : ($Driver_64['id'] == 27 ? '20' : $Driver_64['id']) }}
+            <div class="sub-menu-item" id="Sylvain 64">{{$Driver_64['name']}} {{ $Driver_64['id']}}
                 {{-- <button id="Sylvain 64">Sylvain 64</button> --}}
             <div class="sub-menu1">
                     <button id="64Mira">Mira</button>
