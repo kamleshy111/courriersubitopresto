@@ -2047,8 +2047,7 @@ public function markDelivered($id)
 
 public function waybillPageView($waybillNumber) {
     // Fetch the waybill with its related shipper and recipient
-    $waybill = Waybill::with(['shipper', 'recipient'])->where('id', $waybillNumber)->first();
-
+    $waybill = Waybill::with(['shipper', 'recipient', 'driver'])->where('id', $waybillNumber)->first();
     // Check if the waybill exists
     if (!$waybill) {
         return 'This waybill does not exist';
@@ -2141,13 +2140,15 @@ public function adminDeliveryCompleted(Request $request)
 
     return response()->json([
     'waybills' => $waybills->map(function ($wb) {
+        $driverId = $wb->driver_id ?? null;
+        $mappedDriverId = $driverId ? ($driverId == 99 ? '01' : ($driverId == 27 ? '20' : $driverId)) : null;
         return [
             'id' => $wb->id,
             'shipper_name' => $wb->shipper->name ?? 'N/A',
             'shipper_address' => $wb->shipper->address ?? 'N/A',
             'recipient_name' => $wb->recipient->name ?? 'N/A',
             'recipient_address' => $wb->recipient->address ?? 'N/A',
-            'driver_id' => $wb->driver_id ?? null,
+            'driver_id' => $mappedDriverId ?? null,
             'driver_name' => $wb->driver->name ?? 'Non assigné',
         ];
     // ])
