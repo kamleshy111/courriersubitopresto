@@ -165,8 +165,7 @@ class WaybillsController extends CRUDController {
                             'city_state'        => $request->input($i.'.shipper.city_state'),
                             'postal_code'  => $request->input($i.'.shipper.postal_code'),
                             'contact'      => $request->input($i.'.shipper.contact'),
-                            // 'note_permanent'        => $request->input($i.'.shipper_note'),
-                            'note_permanent'        => $request->input('shipper_note'),
+                            'note_permanent'        => $request->input($i.'.shipper_note'),
                         ]
                     );
 
@@ -187,8 +186,7 @@ class WaybillsController extends CRUDController {
                             'city_state'        => $request->input($i.'.shipper.city_state'),
                             'postal_code'  => $request->input($i.'.shipper.postal_code'),
                             'contact'      => $request->input($i.'.shipper.contact'),
-                            // 'note_permanent'        => $request->input($i.'.shipper_note'),
-                            'note_permanent'        => $request->input('shipper_note'),
+                            'note_permanent'        => $request->input($i.'.shipper_note'),
                         ]
                     );
 
@@ -218,7 +216,7 @@ class WaybillsController extends CRUDController {
                             'city_state'        => $request->input($i.'.recipient.city_state'),
                             'postal_code'  => $request->input($i.'.recipient.postal_code'),
                             'contact'      => $request->input($i.'.recipient.contact'),
-                            // 'note_permanent' => $request->input($i.'.recipient_note'),
+                            'note_permanent' => $request->input($i.'.recipient_note'),
                         ]
                     );
                     }
@@ -238,7 +236,7 @@ class WaybillsController extends CRUDController {
                             'city_state'        => $request->input($i.'.recipient.city_state'),
                             'postal_code'  => $request->input($i.'.recipient.postal_code'),
                             'contact'      => $request->input($i.'.recipient.contact'),
-                            // 'note_permanent' => $request->input($i.'.recipient_note'),
+                            'note_permanent' => $request->input($i.'.recipient_note'),
                         ]
                     );
                     }
@@ -251,69 +249,28 @@ class WaybillsController extends CRUDController {
                     $model->driver_id = $request->input($i . '.driver_id');
                 }
 
-                /*if ($request->has('shipper_note')) {
-                    $model->shipper_note = $request->input('shipper_note');
-                }*/
-
-                // if ($request->has('shipper_note')) {
-                // stop shipper note & recipient note
-                
-                /*if ($request->has($i . '.shipper_note')){
-
+                // Opening hours + Permanent information: sync to waybill and to client note_permanent
+                if ($request->has($i . '.shipper_note')) {
                     $model->shipper_note = $request->input($i . '.shipper_note');
-
-                    // Log::info("shipper with ID: " . $model->shipper_id);
-                    if(is_null($model->shipper_id)){
-                        // $model->shipper_id = $client->id;
-
-                            $shipper = Client::find($client->id);
-                            if ($shipper) {
-
-                                $shipper->note_permanent = $request->input($i . '.shipper_note');
-                                $shipper->save();
-                            }
-
+                    if ($model->shipper_id) {
+                        $shipper = Client::find($model->shipper_id);
+                        if ($shipper) {
+                            $shipper->note_permanent = $request->input($i . '.shipper_note');
+                            $shipper->save();
+                        }
                     }
-                    else if(!is_null($model->shipper_id)){
-                        Log::info("within elseif condition");
-                        if ($model->shipper_id) {
-                            $shipper = Client::find($model->shipper_id);
-                            Log::info("shipper id: " .$shipper);
-                            if ($shipper) {
-                                $shipper->note_permanent = $request->input($i . '.shipper_note');
-                                $shipper->save();
-                            }
+                }
+                if ($request->has($i . '.recipient_note')) {
+                    $model->recipient_note = $request->input($i . '.recipient_note');
+                    if ($model->recipient_id) {
+                        $recipient = Client::find($model->recipient_id);
+                        if ($recipient) {
+                            $recipient->note_permanent = $request->input($i . '.recipient_note');
+                            $recipient->save();
                         }
                     }
                 }
 
-                if ($request->has($i . '.recipient_note')) {
-
-                    $model->recipient_note = $request->input($i . '.recipient_note');
-
-                    Log::info("Recipient with ID: " . $model->recipient_id);
-
-                    if (is_null($model->recipient_id)) {
-                        // If recipient ID is not set yet, try using $client (if available)
-                        $recipient = Client::find($client->id);
-                        if ($recipient) {
-                            $recipient->note_permanent = $request->input($i . '.recipient_note');
-                            $recipient->save();
-                        }
-
-                    } else if (!is_null($model->recipient_id)) {
-                        Log::info("Within recipient elseif condition");
-
-                        $recipient = Client::find($model->recipient_id);
-                        // Log::info("Recipient object: ", ['recipient' => $recipient]);
-
-                        if ($recipient) {
-                            $recipient->note_permanent = $request->input($i . '.recipient_note');
-                            $recipient->save();
-                        }
-                    }
-                }*/
-                
                 // shipper address extension test
                 
                 if ($request->has($i . '.shipper.address_ext')) {
@@ -570,11 +527,23 @@ class WaybillsController extends CRUDController {
             $waybill->driver_id = $request->input('driver_id');
         }
 
-        if ($request->has('shipper_note')) {
-            $waybill->shipper_note = $request->input('shipper_note');
+        $shipperNote = $request->input('shipper_note') ?? $request->input('0.shipper_note');
+        $recipientNote = $request->input('recipient_note') ?? $request->input('0.recipient_note');
+        if ($shipperNote !== null) {
+            $waybill->shipper_note = $shipperNote;
+            // Sync Opening hours + Permanent information to client table
+            if ($waybill->shipper_id && $client_shipper) {
+                $client_shipper->note_permanent = $shipperNote;
+                $client_shipper->save();
+            }
         }
-        if ($request->has('recipient_note')) {
-            $waybill->recipient_note = $request->input('recipient_note');
+        if ($recipientNote !== null) {
+            $waybill->recipient_note = $recipientNote;
+            // Sync Opening hours + Permanent information to client table
+            if ($waybill->recipient_id && $client_recipient) {
+                $client_recipient->note_permanent = $recipientNote;
+                $client_recipient->save();
+            }
         }
 
         if ($request->has('tailgate_1')) {
@@ -2078,7 +2047,7 @@ public function markDelivered($id)
 
 public function waybillPageView($waybillNumber) {
     // Fetch the waybill with its related shipper and recipient
-    $waybill = Waybill::with(['shipper', 'recipient', 'driver'])->where('id', $waybillNumber)->first();
+    $waybill = Waybill::with(['shipper', 'recipient'])->where('id', $waybillNumber)->first();
 
     // Check if the waybill exists
     if (!$waybill) {
@@ -2172,15 +2141,13 @@ public function adminDeliveryCompleted(Request $request)
 
     return response()->json([
     'waybills' => $waybills->map(function ($wb) {
-        $driverId = $wb->driver_id ?? null;
-        $mappedDriverId = $driverId ? ($driverId == 99 ? '01' : ($driverId == 27 ? '20' : $driverId)) : null;
         return [
             'id' => $wb->id,
             'shipper_name' => $wb->shipper->name ?? 'N/A',
             'shipper_address' => $wb->shipper->address ?? 'N/A',
             'recipient_name' => $wb->recipient->name ?? 'N/A',
             'recipient_address' => $wb->recipient->address ?? 'N/A',
-            'driver_id' => $mappedDriverId,
+            'driver_id' => $wb->driver_id ?? null,
             'driver_name' => $wb->driver->name ?? 'Non assigné',
         ];
     // ])

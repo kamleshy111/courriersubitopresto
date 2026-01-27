@@ -41,51 +41,47 @@
 @stop
 
 @section('content')
-    @role('admin')
-        <div class="block table-block mb-4" style="margin-top: 20px;">
+    {{-- Same address book (Carnet d'adresse) for both admin and client. Admin sees all addresses, client sees own. --}}
+    <div class="block table-block mb-4" style="margin-top: 20px;">
         <div class="row">
             <div class="table-responsive">
-                <table id="admin_table_id" class="table row-border hover">
+                <table id="client_table_id" class="table row-border hover">
                     <thead>
                     <tr>
-                        <th style="width: 12%; text-align: center!important;">ID de l´utilisateur</th>
-                        <th style="width: 12%; text-align: center!important;">Nom et prénom</th>
-                        <th style="width: 13%; text-align: center!important;">E-mail</th>
-                        <th style="width: 20%; text-align: center!important;">Voir</th>
+                        <th style="width: 12%; text-align: center!important;">Numéro de facture</th>
+                        <th style="width: 13%; text-align: center!important;">Préfixe</th>
+                        <th style="width: 13%; text-align: center!important;">Nom</th>
+                        <th style="width: 13%; text-align: center!important;">Téléphone</th>
+                        <th style="width: 13%; text-align: center!important;">Extension</th>
+                        <th style="width: 13%; text-align: center!important;">Adresse</th>
+                        <th style="width: 13%; text-align: center!important;">Contact</th>
+                        <th style="width: 13%; text-align: center!important;">Note permanente</th>
+                        <th style="width: 13%; text-align: center!important;">Voir</th>
                     </tr>
                     </thead>
-                    <tbody style="text-align: center!important;">
+                    <tbody style="width: 13%; text-align: center!important;">
 
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
-    @else
-        <div class="block table-block mb-4" style="margin-top: 20px;">
-            <div class="row">
-                <div class="table-responsive">
-                    <table id="client_table_id" class="table row-border hover">
-                        <thead>
-                        <tr>
-                            <th style="width: 12%; text-align: center!important;">Numéro de facture</th>
-                            <th style="width: 13%; text-align: center!important;">Préfixe</th>
-                            <th style="width: 13%; text-align: center!important;">Nom</th>
-                            <th style="width: 13%; text-align: center!important;">Téléphone</th>
-                            <th style="width: 13%; text-align: center!important;">Extension</th>
-                            <th style="width: 13%; text-align: center!important;">Adresse</th>
-                            <th style="width: 13%; text-align: center!important;">Contact</th>
-                            <th style="width: 13%; text-align: center!important;">Note permanente</th>
-                            <th style="width: 13%; text-align: center!important;">Voir</th>
-                        </tr>
-                        </thead>
-                        <tbody style="width: 13%; text-align: center!important;">
 
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
+    @role('admin')
+    {{-- Legacy: admin user list (kept, not displayed). Uses clients-admin-index. --}}
+    <div style="display:none;" aria-hidden="true">
+        <table id="admin_table_id" class="table row-border hover">
+            <thead>
+            <tr>
+                <th style="width: 12%; text-align: center!important;">ID de l´utilisateur</th>
+                <th style="width: 12%; text-align: center!important;">Nom et prénom</th>
+                <th style="width: 13%; text-align: center!important;">E-mail</th>
+                <th style="width: 20%; text-align: center!important;">Voir</th>
+            </tr>
+            </thead>
+            <tbody style="text-align: center!important;"></tbody>
+        </table>
+    </div>
     @endrole
 @stop
 
@@ -113,6 +109,8 @@ document.addEventListener('DOMContentLoaded', function () {
     
     <script>
         $(document).ready( function () {
+            // Same address-book table for both admin and client. Admin sees all addresses, client sees own.
+            var addressTableUrl = @json(\Laratrust::hasRole('admin') ? url('admin/clients-admin-address-index') : url('admin/clients-client-index'));
             var userTable = $('#client_table_id').DataTable({
                 processing   : true,
                 serverSide   : true,
@@ -124,33 +122,17 @@ document.addEventListener('DOMContentLoaded', function () {
                 searching:   true,
                 dom:'lBfrtip',
                 "ajax" : {
-                    "url" : '{{ url("admin/clients-client-index") }}',
+                    "url" : addressTableUrl,
                 },
                 "columns" : [
-                    {
-                        "data" : "id"
-                    },
-                    {
-                        "data" : "prefix"
-                    },
-                    {
-                        "data" : "name"
-                    },
-                    {
-                        "data" : "phone"
-                    },
-                    {
-                        "data" : "extension"
-                    },
-                    {
-                        "data" : "address"
-                    },
-                    {
-                        "data" : 'contact'
-                    },
-                    {
-                        "data" : 'note_permanent'
-                    },
+                    { "data" : "id" },
+                    { "data" : "prefix" },
+                    { "data" : "name" },
+                    { "data" : "phone" },
+                    { "data" : "extension" },
+                    { "data" : "address" },
+                    { "data" : 'contact' },
+                    { "data" : 'note_permanent' },
                     {
                         "data" : 'action',
                         "orderable": false,
@@ -163,41 +145,30 @@ document.addEventListener('DOMContentLoaded', function () {
                 buttons: ["copy", "csv", "excel", "pdf", "print", "colvis"]
             });
 
-
-            var table = $('#admin_table_id').DataTable({
-                processing   : true,
-                serverSide   : true,
-                responsive   : true,
-                sorting      : false,
-                lengthChange : true,
-                autoWidth    : false,
-                pageLength   : 7,
-                searching:   true,
-                dom:'lBfrtip',
-                "ajax" : {
-                    "url" : '{{ url("admin/clients-admin-index") }}',
-                },
-                "columns" : [
-                    {
-                        "data" : "id"
-                    },
-                    {
-                        "data" : "name",
-                    },
-                    {
-                        "data" : "email"
-                    },
-                    {
-                        "data" : 'action',
-                        "orderable": false,
-                        "searchable": false
-                    }
-                ],
-                language: {
-                    url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/fr-FR.json',
-                },
-                buttons: ["copy", "csv", "excel", "pdf", "print", "colvis"]
-            });
+            // Legacy admin user list (kept). Only init when element exists.
+            var table;
+            if ($('#admin_table_id').length) {
+                table = $('#admin_table_id').DataTable({
+                    processing   : true,
+                    serverSide   : true,
+                    responsive   : true,
+                    sorting      : false,
+                    lengthChange : true,
+                    autoWidth    : false,
+                    pageLength   : 7,
+                    searching:   true,
+                    dom:'lBfrtip',
+                    "ajax" : { "url" : '{{ url("admin/clients-admin-index") }}' },
+                    "columns" : [
+                        { "data" : "id" },
+                        { "data" : "name" },
+                        { "data" : "email" },
+                        { "data" : 'action', "orderable": false, "searchable": false }
+                    ],
+                    language: { url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/fr-FR.json' },
+                    buttons: ["copy", "csv", "excel", "pdf", "print", "colvis"]
+                });
+            }
 
             $(document).on('click', '.delete-user', function(e) {
                 e.preventDefault();
@@ -223,7 +194,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                     text: 'Supprimé avec succès',
                                     icon: 'success',
                                 });
-                                table.ajax.reload();
+                                if (typeof table !== 'undefined' && table) table.ajax.reload();
                             },
                             error: function (xhr, status, error) {
                                 Swal.fire({
