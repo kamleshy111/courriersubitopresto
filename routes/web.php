@@ -188,6 +188,7 @@ Route::name('admin.')->prefix('admin')->middleware(['auth'])->group(function() {
 
     Route::get('clients-client-index', [\App\Http\Controllers\DataTables\Client\ClientController::class, 'index']);
     Route::get('clients-admin-index', [\App\Http\Controllers\DataTables\Admin\ClientController::class, 'index']);
+    Route::get('clients-admin-address-index', [\App\Http\Controllers\DataTables\Admin\ClientController::class, 'addressIndex']);
     Route::post('client-password-request', [\App\Http\Controllers\DataTables\Admin\ClientController::class,'emailClientPassUpdate'])->name('client.password.request');
 
     Route::get('clients/{user_id}/user-clients', [\App\Http\Controllers\Admin\ClientsController::class, 'userClients']);
