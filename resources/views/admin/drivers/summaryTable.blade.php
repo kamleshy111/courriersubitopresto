@@ -262,7 +262,7 @@ also need to check current date data
                     </th>
 
                     <th colspan="3" ondblclick="enableEdit(this)">
-                        Total: <span contenteditable="false" id="totalPriceCell" onkeydown="handleEnter(event)" onblur="disableEdit(this)">{{ number_format($total ?? 0, 2) }} $</span>
+                        Total: <span contenteditable="false" id="totalPriceCellHeader" onkeydown="handleEnter(event)" onblur="disableEdit(this)">{{ number_format($total ?? 0, 2) }} $</span>
                     </th>
 
                 </tr>
@@ -439,7 +439,7 @@ also need to check current date data
                     <td colspan="5" style="text-align: right; font-weight: bold;">TOTAL:</td>
 
                     {{--<td style="font-weight: bold;" id="totalPriceCell">{{ number_format($waybills->sum('price'), 2) }} $</td>--}}
-                    <td colspan="2" style="font-weight: bold;" id="totalPriceCell">{{ number_format($total ?? 0, 2) }} $</td>
+                    <td colspan="2" style="font-weight: bold;" id="totalPriceCellFooter">{{ number_format($total ?? 0, 2) }} $</td>
 
                 </tr>
 
@@ -1550,7 +1550,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         let tableBody = document.getElementById('waybillTableBody');
 
-        let totalPriceCell = document.getElementById('totalPriceCell');
+        let totalPriceCellHeader = document.getElementById('totalPriceCellHeader');
+        let totalPriceCellFooter = document.getElementById('totalPriceCellFooter');
 
 
 
@@ -1572,7 +1573,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 tableBody.innerHTML = '<tr><td colspan="7" style="text-align: center;">Aucune donnée trouvée pour cette date.</td></tr>';
 
-                totalPriceCell.innerText = '0.00 $';
+                if (totalPriceCellHeader) totalPriceCellHeader.innerText = '0.00 $';
+                if (totalPriceCellFooter) totalPriceCellFooter.innerText = '0.00 $';
 
             } else {
 
@@ -1661,7 +1663,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 
-                totalPriceCell.innerText = totalPrice.toFixed(2) + ' $';
+                if (totalPriceCellHeader) totalPriceCellHeader.innerText = totalPrice.toFixed(2) + ' $';
+                if (totalPriceCellFooter) totalPriceCellFooter.innerText = totalPrice.toFixed(2) + ' $';
 
                 // attachEditableListeners();
 
@@ -2236,7 +2239,10 @@ function updateTotalPrice_old() {
 
     });
 
-    document.getElementById('totalPriceCell').innerText =  total.toFixed(2) + ' $';
+    const headerTotalCell = document.getElementById('totalPriceCellHeader');
+    const footerTotalCell = document.getElementById('totalPriceCellFooter');
+    if (headerTotalCell) headerTotalCell.innerText = total.toFixed(2) + ' $';
+    if (footerTotalCell) footerTotalCell.innerText = total.toFixed(2) + ' $';
 
 }
 
@@ -2250,13 +2256,10 @@ function updateTotalPrice() {
         total += price;
     });
 
-    const totalCell = document.getElementById('totalPriceCell');
-
-    if (totalCell) {
-        totalCell.innerText = total.toFixed(2) + ' $';
-    } else {
-        // console.warn('Element with ID "totalPriceCell" not found.');
-    }
+    const headerTotalCell = document.getElementById('totalPriceCellHeader');
+    const footerTotalCell = document.getElementById('totalPriceCellFooter');
+    if (headerTotalCell) headerTotalCell.innerText = total.toFixed(2) + ' $';
+    if (footerTotalCell) footerTotalCell.innerText = total.toFixed(2) + ' $';
 }
 
 
