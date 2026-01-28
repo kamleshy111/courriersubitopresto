@@ -292,11 +292,7 @@ class WaybillController extends Controller
 
 
             $waybills = Waybill::with('recipient','shipper')
-
-            ->where('type', $type)
-
-            ->orderByDesc('date');
-
+                ->where('type', $type);
 
 
             // ->get();
@@ -371,11 +367,19 @@ class WaybillController extends Controller
 
         })*/
 
-        ->editColumn('soft_id', function ($row) {
-    return $row->user->client
-        ? $row->user->client->prefix . str_pad($row->soft_id, 6, '0', STR_PAD_LEFT)
-        : '';
-})
+        // ->editColumn('soft_id', function ($row) {
+        //     return $row->user->client
+        //         ? $row->user->client->prefix . str_pad($row->soft_id, 6, '0', STR_PAD_LEFT)
+        //         : '';
+        // })
+
+                ->editColumn('soft_id', function ($row) {
+            if ($row->user && $row->user->client) {
+                return $row->user->client->prefix . str_pad($row->soft_id, 6, '0', STR_PAD_LEFT);
+            }
+
+            return str_pad($row->soft_id, 6, '0', STR_PAD_LEFT);
+        })
 
 
         ->editColumn('status', function ($row) {

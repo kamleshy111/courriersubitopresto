@@ -592,6 +592,10 @@ serverSide   : true,
 
 responsive   : true,
 
+ordering     : true,   // sorting: false => बदल दिया
+
+// ⭐ DEFAULT ORDER (Date column DESC)
+order        : [[4, 'desc']],   // 4 = date column index
 
 lengthChange : true,
 
