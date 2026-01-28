@@ -42,7 +42,7 @@ class WaybillController extends Controller
             ->where('user_id', \Auth::id())
 
             ->where('type', $type)
-            
+
             ->when($type == 1, function ($query) {
     $query->where(function ($q) {
         $q->where('submission_status', '!=', 3)
@@ -182,7 +182,7 @@ class WaybillController extends Controller
                 if($request->query('waybill-type') && $request->query('waybill-type') == "true"){
 
                     $button .= '<a class="btn btn-sm btn-primary"  target="_blank" href="' . url('admin/waybill/' . $row->id) . '"><i class="fas fa-eye"></i> Voir Waybill</a>';
-                    
+
 
                 }
 
@@ -203,7 +203,7 @@ class WaybillController extends Controller
                     $button .= '<a class="btn btn-sm btn-success btn-approve" style="background-color:#37BC9B;" data-waybill-id="' . $row->id . '"><i class="fas fa-check"></i> Approuver</a>';
 
                 }
-                
+
                 if($row->price != null && $row->type == 1 && $row->submission_status !== 0)
                 {
 
@@ -211,7 +211,7 @@ class WaybillController extends Controller
 
                 }
 
-                
+
                 if($row->price != null && $row->type == 1 && $row->submission_status !== 0)
 
                 {
@@ -219,8 +219,8 @@ class WaybillController extends Controller
                     $button .= '<a class="btn btn-sm btn-danger btn-reject" style="background-color:#d72e0a;"  data-waybill-id="' . $row->id . '"><i class="fas fa-times"></i> Supprimer </a>';
 
                 }
-                
-                
+
+
                 /*if($row->price != null && $row->type == 1 && $row->submission_status == 0)
 
                 {
@@ -295,7 +295,7 @@ class WaybillController extends Controller
 
             ->where('type', $type)
 
-            ->orderByDesc('id');
+            ->orderByDesc('date');
 
 
 
@@ -370,7 +370,7 @@ class WaybillController extends Controller
             return str_pad($row->soft_id, 6, '0', STR_PAD_LEFT);
 
         })*/
-        
+
         ->editColumn('soft_id', function ($row) {
     return $row->user->client
         ? $row->user->client->prefix . str_pad($row->soft_id, 6, '0', STR_PAD_LEFT)
@@ -461,7 +461,7 @@ class WaybillController extends Controller
 
     $button .= '</button>';
     $button .= '<a class="btn btn-sm btn-primary wabill-pageview"  target="_blank" href="' . url('admin/waybill/' . $row->id) . '"><i class="fas fa-eye"></i> Voir Waybill</a>';
-    
+
 
             if ($row->type == 1) {
 
