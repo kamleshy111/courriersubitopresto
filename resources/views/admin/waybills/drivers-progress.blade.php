@@ -2659,7 +2659,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                     <td contenteditable="false">${formatCreationHour?formatCreationHour: "&nbsp;"}</td>
                                     <td class="editable" data-table="waybills" data-column="status" data-id=${note.id}>${statusTranslated.toUpperCase()}</td>
                                     {{-- <td >${driver[driverId]? driver[driverId] : ""} ${driverId? driverId : "&nbsp;" } </td> --}}
-                                    <td>${driverId? driverId : "&nbsp;" } </td>
+                                    <td>${driverId ? (driverId == 99 ? '01' : (driverId == 27 ? '20' : driverId)) : "&nbsp;" } </td>
                                 </tr>
                                 <tr>
 
@@ -3847,6 +3847,21 @@ function getDashboardColumns(cellIdString) {
     // });
 }
 
+// Helper function to map driver IDs
+function mapDriverId(driverId) {
+    if (!driverId || driverId === "") {
+        return "&nbsp;";
+    }
+    const id = parseInt(driverId);
+    if (id == 99) {
+        return '01';
+    } else if (id == 27) {
+        return '20';
+    } else {
+        return driverId;
+    }
+}
+
 function updateTableCell(selectedNoteId, newValue) {
         // alert("function runs!");
         console.log(`within function selectedNoteId: ${selectedNoteId}`);
@@ -3868,8 +3883,9 @@ function updateTableCell(selectedNoteId, newValue) {
             if (index == 2){
             // if (cells.length == 2 ) {
                 // Update the 3rd cell (index 2) with the new value
-                // alert(cells[2].textContent);
-                cells[2].textContent = newValue;
+                // Apply driver ID mapping for CHAUFFEUR column
+                const mappedValue = mapDriverId(newValue);
+                cells[2].textContent = mappedValue;
                 // alert(cells[2].textContent);
 
             }

@@ -50,9 +50,9 @@ class ClientsController extends CRUDController {
 
     $client = Client::findOrFail($request->route()->parameter('client'));
 
-    // User can only access their own client record
+    // Client-role users can only access client records they own
     abort_if(
-        auth()->user()->client_id !== $client->id,
+        $client->user_id !== auth()->id(),
         403
     );
 
@@ -140,6 +140,10 @@ class ClientsController extends CRUDController {
     public function deleteClient($clientId)
     {
         $client = Client::findOrFail($clientId);
+        abort_if(
+            !\Laratrust::hasRole('admin') && $client->user_id !== auth()->id(),
+            403
+        );
         $client->delete();
         DB::table('users')
         ->where('id', $clientId)

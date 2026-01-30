@@ -30,7 +30,7 @@
 
             <div class="col-md-4">
 
-                
+
                     {{-- <a href="{{ auth()->check() && auth()->user()->roles->contains('id', 3) ? url('admin/driver-waybill/' . auth()->id()) : '#' }}"> --}}
                         {{-- <a href="{{ auth()->check() && auth()->user()->roles->contains('id', 3) ? url('admin/driver-waybill/' . auth()->id()) : '#'. /in-progress }}"> --}}
                     <a href="{{ auth()->check() && auth()->user()->roles->contains('id', 3) ? url('admin/driver-waybill/' . auth()->id() . '/in-progress') : '#' }}">
@@ -213,8 +213,8 @@
 
 
 
-            
-            
+
+
             <div class="col-md-4">
 
                     <a href="admin/client/in-progress">
@@ -256,7 +256,7 @@
 
                             <p class="d-flex flex-column">
 
-                                <span class="text-bold text-lg value" style="color: #ffffff;">Preuves de livraison<br> 
+                                <span class="text-bold text-lg value" style="color: #ffffff;">Preuves de livraison<br>
                                 Livraison terminé</span>
 
                                 <span class="label"></span>
@@ -268,15 +268,15 @@
                     </div>
 
                 </div>
-                
+
                 </a>
-                
+
             </div>
-            
+
         </div>
 
 
-        
+
 
 
         <div class="row">
@@ -308,7 +308,7 @@
                 </a>
 
             </div>
-            
+
             <div class="col-md-4">
 
                         <a href="admin/client/pickedup">
@@ -364,10 +364,10 @@
                 </a>
 
             </div>
-            
 
 
-            
+
+
 
             <div class="col-md-4">
 
@@ -393,32 +393,61 @@
 
             </div>
 
-            
-            
+
+
             <div class="col-md-4">
 
-                <div class="card" style="border-radius: 14px; background-color: #de7d55; width: 100%; height: 134px;">
+                <a href="{{ url('admin/account')}}">
+                    <div class="card" style="border-radius: 14px; background-color: #de7d55; width: 100%; height: 134px;">
 
-                    <div class="card-body">
+                        <div class="card-body">
 
-                        <div class="d-flex">
+                            <div class="d-flex">
 
-                            <p class="d-flex flex-column">
+                                <p class="d-flex flex-column">
 
-                                <span class="text-bold text-lg value" style="color: #ffffff;">Compte (à venir)</span>
+                                    {{-- <span class="text-bold text-lg value" style="color: #ffffff;">Compte (à venir)</span> --}}
+                                    <span class="text-bold text-lg value" style="color: #ffffff;">Votre compte</span>
 
-                                <span class="label"></span>
+                                    <span class="label"></span>
 
-                            </p>
+                                </p>
+
+                            </div>
 
                         </div>
 
                     </div>
-
-                </div>
+                </a>
 
             </div>
-            
+
+            <div class="col-md-4">
+
+                <a href="{{ url('admin/my-account')}}">
+                    <div class="card" style="border-radius: 14px; background-color: #de5555; width: 100%; height: 134px;">
+
+                        <div class="card-body">
+
+                            <div class="d-flex">
+
+                                <p class="d-flex flex-column">
+
+                                    <span class="text-bold text-lg value" style="color: #ffffff;"> Modifier mon mot de passe </span>
+
+                                    <span class="label"></span>
+
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                </a>
+
+            </div>
+
             @if( ($user && $user->roles->contains('id', 2)))
 
             {{-- in progress --}}
@@ -579,11 +608,11 @@
     @if(auth()->check() && auth()->user()->roles->contains('id', 1))
 
  {{-- @role('admin') --}}
- 
- 
+
+
 
     <form method="POST" action="{{ route('admin.notes.store') }}">
-        
+
 
         <div class="content">
 
@@ -604,7 +633,7 @@
                             <textarea id="news" name="news" class="card-body">
 
                                            {!! $note->news !!}
-                                           
+
 
                                         </textarea>
 
@@ -650,8 +679,8 @@
 
                             <textarea id="quick_links_1" name="quick_links_1" class="card-body">
 
-                                        {!! $note->quick_links_1 !!} 
-                                        
+                                        {!! $note->quick_links_1 !!}
+
 
                                     </textarea>
 
@@ -846,10 +875,10 @@
 document.addEventListener('DOMContentLoaded', function () {
         // Find the anchor tag inside the li
         let clientProfileUpdate = document.querySelector('#dynamic-client-profile a');
-        
+
         @if(auth()->check() && auth()->user()->roles->contains('id', 2))
             clientProfileUpdate.href = "{{ url('admin/users/' . auth()->id()) .'/edit' }}";
-            
+
         @else
             // Optionally, set a fallback URL for non-drivers (or leave as is)
             // waybillLink.href = "/#"; // or set to some default link
@@ -857,7 +886,7 @@ document.addEventListener('DOMContentLoaded', function () {
 })
 </script>
 
-            
+
 
 
             <script type="text/javascript">

@@ -28,7 +28,7 @@
             box-shadow: 0 1px 3px rgba(0,0,0,0.2);
             z-index: 1;
         }*/
-        
+
         .ribbon-container {
     position: relative;
 }
@@ -66,7 +66,7 @@
         body{
             background-color: #f4f6f9!important;
         }
-        
+
         #overlay {
             position: fixed;
             top: 0;
@@ -180,7 +180,7 @@
             <button id="resetButton" class="btn btn-secondary">♻️ Réinitialiser</button>
          </div>
     </div> --}}
-    
+
     <div class="row mb-3">
   <div class="col-md-4">
     <div class="input-group">
@@ -192,8 +192,8 @@
     </div>
   </div>
 </div>
-    
-    
+
+
                 <div class="block table-block mt-5 mb-4" style="margin-top: 20px;">
                 <div class="row">
                     <div class="table-responsive px-3">
@@ -261,10 +261,10 @@
 document.addEventListener('DOMContentLoaded', function () {
         // Find the anchor tag inside the li
         let clientProfileUpdate = document.querySelector('#dynamic-client-profile a');
-        
+
         @if(auth()->check() && auth()->user()->roles->contains('id', 2))
             clientProfileUpdate.href = "{{ url('admin/users/' . auth()->id()) .'/edit' }}";
-            
+
         @else
             // Optionally, set a fallback URL for non-drivers (or leave as is)
             // waybillLink.href = "/#"; // or set to some default link
@@ -478,7 +478,7 @@ document.addEventListener('DOMContentLoaded', function () {
             var waybillType = searchParams.get('waybill');
 
             var submissionType = searchParams.get('archive');
-            
+
 
             if(waybillType && (waybillType === "false" || waybillType === "true")){
                 // Client DataTable
@@ -500,7 +500,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             "data" : "soft_id",
                             searchable: true
                         },
-                        
+
                         {
                             "data" : "recipient.name",
                             "defaultContent": "N/A"
@@ -532,14 +532,14 @@ document.addEventListener('DOMContentLoaded', function () {
                     },
                     buttons: ["copy", "csv", "excel", "pdf", "print", "colvis"]
                 });
-                
+
                 $(document).on('click', '.prix', function (e) {
                     e.preventDefault();
 
                     const id = $(this).data('id');
                     // console.log(id);
                     // alert(id);
-                    
+
                     const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
                     if (!id) {
@@ -592,7 +592,10 @@ serverSide   : true,
 
 responsive   : true,
 
-sorting      : false,
+ordering     : true,   // sorting: false => बदल दिया
+
+// ⭐ DEFAULT ORDER (Date column DESC)
+order        : [[4, 'desc']],   // 4 = date column index
 
 lengthChange : true,
 
@@ -631,7 +634,7 @@ dom:'lBfrtip',
         searchable: true
 
     },*/
-    
+
     // new modified 9.12.24
     {
         "data" : "soft_id",
@@ -669,9 +672,9 @@ dom:'lBfrtip',
     {
 
         "data" : "date"
-        
+
     // data: waybillType === "true" ? "date" : "submission_approval_date"
-    
+
      /*data: submissionType === "true"
         ? "submission_approval_date"
         : "date",
@@ -1227,12 +1230,12 @@ function updateApprovalStatus1(waybillId, status) {
             }
 
         });
-        
-        
-            
+
+
+
 
     </script>
-    
+
     <script>
 (function () {
     // Blade-rendered endpoints / token
@@ -1283,7 +1286,7 @@ function updateApprovalStatus1(waybillId, status) {
         return html;
     }*/
 
-    
+
     function buildActionHtml(wb) {
         var html = '<div class="row"><div class="col-md-12 col-sm-6">';
         html += '<a class="btn btn-sm btn-info" title="modifier" style="width:2rem;padding:8px 0;background-color:#054AFA;" href="/admin/waybills/' + wb.id + '/edit?waybill=true"><i class="fa fa-edit"></i></a> ';
@@ -1295,7 +1298,7 @@ function updateApprovalStatus1(waybillId, status) {
         html += '</div></div>';
         return html;
     }
-    
+
     // Helper: convert server response waybills[] into objects matching DataTable columns (soft_id, recipient.name, recipient.address, delivery_status, date, price?, action)
     function mapToObjects(waybills) {
         return waybills.map(function (wb) {
@@ -1444,7 +1447,7 @@ function updateApprovalStatus1(waybillId, status) {
             $admin.find('tbody').empty();
         }
     });*/
-    
+
     // Replace existing reset handler with this block
 $('#waybill-reset-btn').on('click', function () {
     $('#waybill-search-input').val('');
