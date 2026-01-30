@@ -117,7 +117,7 @@
 
                                     <p class="d-flex flex-column">
 
-                                        <span class="text-bold text-lg value" style="color: #ffffff;">Compte (à venir)</span>
+                                        <span class="text-bold text-lg value" style="color: #ffffff;">Votre compte</span>
 
                                         <span class="label"></span>
 

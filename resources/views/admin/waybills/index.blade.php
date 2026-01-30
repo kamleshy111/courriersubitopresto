@@ -258,20 +258,6 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10.15.7/dist/sweetalert2.min.js"></script>
 
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-        // Find the anchor tag inside the li
-        let clientProfileUpdate = document.querySelector('#dynamic-client-profile a');
-
-        @if(auth()->check() && auth()->user()->roles->contains('id', 2))
-            clientProfileUpdate.href = "{{ url('admin/users/' . auth()->id()) .'/edit' }}";
-
-        @else
-            // Optionally, set a fallback URL for non-drivers (or leave as is)
-            // waybillLink.href = "/#"; // or set to some default link
-        @endif
-})
-</script>
-<script>
 /*(function () {
     // Blade helpers: adjust these if your route names/URLs differ
     var datatablesUrl = "{{ url('admin/waybills/datatables') }}"; // adminDataTable endpoint (server-side)

@@ -422,32 +422,6 @@
 
             </div>
 
-            <div class="col-md-4">
-
-                <a href="{{ url('admin/my-account')}}">
-                    <div class="card" style="border-radius: 14px; background-color: #de5555; width: 100%; height: 134px;">
-
-                        <div class="card-body">
-
-                            <div class="d-flex">
-
-                                <p class="d-flex flex-column">
-
-                                    <span class="text-bold text-lg value" style="color: #ffffff;"> Modifier mon mot de passe </span>
-
-                                    <span class="label"></span>
-
-                                </p>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-                </a>
-
-            </div>
-
             @if( ($user && $user->roles->contains('id', 2)))
 
             {{-- in progress --}}
@@ -870,24 +844,6 @@
         });
 
     </script>
-
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-        // Find the anchor tag inside the li
-        let clientProfileUpdate = document.querySelector('#dynamic-client-profile a');
-
-        @if(auth()->check() && auth()->user()->roles->contains('id', 2))
-            clientProfileUpdate.href = "{{ url('admin/users/' . auth()->id()) .'/edit' }}";
-
-        @else
-            // Optionally, set a fallback URL for non-drivers (or leave as is)
-            // waybillLink.href = "/#"; // or set to some default link
-        @endif
-})
-</script>
-
-
-
 
             <script type="text/javascript">
 

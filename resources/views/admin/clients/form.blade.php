@@ -1,21 +1,6 @@
 @push('js')
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBZMgyvKW_R8_KOzVx169YqkpR6yrnjxhE&libraries=places"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-        // Find the anchor tag inside the li
-        let clientProfileUpdate = document.querySelector('#dynamic-client-profile a');
-        if (!clientProfileUpdate) return;
-        @if(auth()->check() && auth()->user()->roles->contains('id', 2))
-            clientProfileUpdate.href = "{{ url('admin/users/' . auth()->id()) .'/edit' }}";
-            
-        @else
-            // Optionally, set a fallback URL for non-drivers (or leave as is)
-            // waybillLink.href = "/#"; // or set to some default link
-        @endif
-})
-</script>
-
-<script>
         function initAutocomplete_client() {
             const addressInput = document.getElementById('inp-address');
             const autocomplete = new google.maps.places.Autocomplete(addressInput, {
