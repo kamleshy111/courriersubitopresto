@@ -397,16 +397,17 @@
 
             <div class="col-md-4">
 
-                <div class="card" style="border-radius: 14px; background-color: #de7d55; width: 100%; height: 134px;">
+                <a href="{{ url('admin/account')}}">
+                    <div class="card" style="border-radius: 14px; background-color: #de7d55; width: 100%; height: 134px;">
 
-                    <a href="{{ route('admin.profile.index')}}">
                         <div class="card-body">
 
                             <div class="d-flex">
 
                                 <p class="d-flex flex-column">
 
-                                    <span class="text-bold text-lg value" style="color: #ffffff;">Compte (à venir)</span>
+                                    {{-- <span class="text-bold text-lg value" style="color: #ffffff;">Compte (à venir)</span> --}}
+                                    <span class="text-bold text-lg value" style="color: #ffffff;">Votre compte</span>
 
                                     <span class="label"></span>
 
@@ -415,9 +416,35 @@
                             </div>
 
                         </div>
-                    </a>
 
-                </div>
+                    </div>
+                </a>
+
+            </div>
+
+            <div class="col-md-4">
+
+                <a href="{{ url('admin/my-account')}}">
+                    <div class="card" style="border-radius: 14px; background-color: #de5555; width: 100%; height: 134px;">
+
+                        <div class="card-body">
+
+                            <div class="d-flex">
+
+                                <p class="d-flex flex-column">
+
+                                    <span class="text-bold text-lg value" style="color: #ffffff;"> Modifier mon mot de passe </span>
+
+                                    <span class="label"></span>
+
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                </a>
 
             </div>
 

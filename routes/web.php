@@ -69,6 +69,7 @@ Route::name('admin.')->prefix('admin')->middleware(['auth'])->group(function() {
     Route::get('/', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard.index');
     Route::get('/profile', [\App\Http\Controllers\Admin\ProfileController::class, 'index'])->name('profile.index');
     Route::post('/profile', [\App\Http\Controllers\Admin\ProfileController::class, 'updateInfo']);
+    Route::get('/account', [\App\Http\Controllers\Admin\ProfileController::class, 'account'])->name('account.index');
 
     // Route::get('/route-chauffeur', [\App\Http\Controllers\Admin\RouteChauffeurController::class, 'index'])->name('route-chauffeur.index');
     // Route::get('/driver/single-waybill/{id}', [\App\Http\Controllers\Admin\DriverController::class, 'singleUpload'])->name('single.upload');
@@ -83,7 +84,7 @@ Route::name('admin.')->prefix('admin')->middleware(['auth'])->group(function() {
     Route::get('/driver-waybill/{id}/pickedup', [\App\Http\Controllers\Admin\DriverController::class, 'clientDriverWaybillPickedUp']);
     Route::get('/driver-waybill/{id}/delivered', [\App\Http\Controllers\Admin\DriverController::class, 'clientDriverWaybillDelivered']);
 
-    //old summary table 
+    //old summary table
     // Route::get('/driver-summary-table/{id}', [\App\Http\Controllers\Admin\DriverController::class, 'driverSummaryTable']);
     Route::get('/drivers-progress', [\App\Http\Controllers\Admin\DriverProgressController::class, 'index'])->name('driver_progress.index');
     Route::post('/update-driver-id', [\App\Http\Controllers\Admin\DriverProgressController::class, 'assignDriver']);
@@ -92,8 +93,8 @@ Route::name('admin.')->prefix('admin')->middleware(['auth'])->group(function() {
     Route::post('/update-sticky-note', [\App\Http\Controllers\Admin\DriverProgressController::class, 'updateStickyNote']);
     Route::post('/remove-sticky-note-position', [\App\Http\Controllers\Admin\DriverProgressController::class, 'removePosition']);
     Route::post('/update-cheque-absent',[\App\Http\Controllers\Admin\DriverProgressController::class, 'updatChequeStatus']);
-    
-    
+
+
     Route::post('/driver-summary-table/email', [\App\Http\Controllers\Admin\DriverController::class, 'emailReport']);
     Route::get('/driver-summary-table/{id}', [\App\Http\Controllers\Admin\DriverController::class, 'driverSummaryTable']);
     Route::get('/driver/{id}/summaryTable', [\App\Http\Controllers\Admin\DriverController::class, 'getDriverWaybills']);
@@ -119,8 +120,8 @@ Route::name('admin.')->prefix('admin')->middleware(['auth'])->group(function() {
     Route::post('waybills/upload-signature', [\App\Http\Controllers\Admin\WaybillsController::class, 'uploadSignature'])->name('waybills.uploadSignature');//new
     Route::post('waybills/{id}/upload-SignatureNote', [\App\Http\Controllers\Admin\WaybillsController::class, 'uploadSignatureNote'])->name('waybills.uploadSignatureNote');//new
     Route::post('waybills/{id}/upload-pickup-image', [\App\Http\Controllers\Admin\WaybillsController::class, 'uploadPickupImage'])->name('waybills.uploadPickupImage');
-    // below is the new line 
-    Route::post('waybills/{id}/upload-pickup-image-updated', [\App\Http\Controllers\Admin\WaybillsController::class, 'uploadPickupImageUpdated'])->name('waybills.uploadPickupImageUpdated'); 
+    // below is the new line
+    Route::post('waybills/{id}/upload-pickup-image-updated', [\App\Http\Controllers\Admin\WaybillsController::class, 'uploadPickupImageUpdated'])->name('waybills.uploadPickupImageUpdated');
     Route::post('waybills/{id}/upload-drop-image', [\App\Http\Controllers\Admin\WaybillsController::class, 'uploadDropImage'])->name('waybills.uploadDropImage');
     // new route for drop image added below
     Route::post('waybills/{id}/upload-drop-image-updated', [\App\Http\Controllers\Admin\WaybillsController::class, 'uploadDropImageUpdated'])->name('waybills.uploadDropImageUpdated');
@@ -128,14 +129,14 @@ Route::name('admin.')->prefix('admin')->middleware(['auth'])->group(function() {
     Route::get('waybill/{id}', [\App\Http\Controllers\Admin\WaybillsController::class, 'waybillPageView']);
     // new ribbon update in admin table
     Route::post('/waybills/mark-as-viewed/{id}', [\App\Http\Controllers\Admin\WaybillsController::class, 'markAsViewed']);
-    
-    
+
+
     // admin waybills table
 
     Route::get('/driver-waybill/admin/in-progress/{id}', [\App\Http\Controllers\Admin\DriverController::class, 'adminDriverWaybillOnProgress']);
     Route::get('/driver-waybill/admin/pickedup/{id}', [\App\Http\Controllers\Admin\DriverController::class, 'adminDriverWaybillPickedUp']);
     Route::get('/driver-waybill/admin/delivered/{id}', [\App\Http\Controllers\Admin\DriverController::class, 'adminDriverWaybillDelivered']);
-    
+
     // client delivery status
     Route::get('/client/in-progress', [\App\Http\Controllers\Client\WaybillController::class, 'clientDeliveryInprogress']);
     Route::get('/client/pickedup', [\App\Http\Controllers\Client\WaybillController::class, 'clientDeliveryPickedup']);
@@ -148,7 +149,7 @@ Route::name('admin.')->prefix('admin')->middleware(['auth'])->group(function() {
     Route::post('/client/waybills/waybill-by-id', [\App\Http\Controllers\Client\WaybillController::class, 'clientByWaybillID']);
     // client name search
     Route::get('/clients/search', [\App\Http\Controllers\Client\WaybillController::class, 'clientNameSearch']);
-    
+
     // admin search by waybill id
     Route::post('/waybills/waybill-by-id', [\App\Http\Controllers\Admin\WaybillsController::class, 'adminByWaybillID'])->name('waybills.search-by-id');
     // admin summary table with date filter
@@ -160,8 +161,8 @@ Route::name('admin.')->prefix('admin')->middleware(['auth'])->group(function() {
     Route::resource('roles', \App\Http\Controllers\Admin\RolesController::class);
     Route::resource('permissions', \App\Http\Controllers\Admin\PermissionsController::class);
     Route::resource('users', \App\Http\Controllers\Admin\UsersController::class);
-    // pass update mail 
-    
+    // pass update mail
+
     Route::post('/users/request-password-update', [App\Http\Controllers\Admin\UsersController::class, 'requestPasswordUpdate'])->name('users.requestPasswordUpdate');
 
 
@@ -179,7 +180,7 @@ Route::name('admin.')->prefix('admin')->middleware(['auth'])->group(function() {
     Route::get('client-submission-archive-index', [\App\Http\Controllers\Client\WaybillController::class, 'clientArchivedSubmissionDataTable']);
     // new email for submission price discussion
     Route::post('/send-price-dispute-email', [\App\Http\Controllers\Client\WaybillController::class, 'disputeEmail']);
-    
+
     // pdf upload for client profile
     Route::post('upload-client/pdf', [\App\Http\Controllers\Admin\ClientsController::class, 'store_pdf'])->name('clients.store_pdf');
     // Delete PDF for client

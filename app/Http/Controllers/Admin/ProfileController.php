@@ -13,6 +13,11 @@ class ProfileController extends Controller
         return view('admin.profile.index');
     }
 
+    public function account()
+    {
+        return view('admin.account.index');
+    }
+
     public function updateInfo(Request $request)
     {
         $validator = \Validator::make($request->all(), [
