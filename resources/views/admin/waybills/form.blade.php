@@ -1522,20 +1522,6 @@
 
 @push('js')
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-        // Find the anchor tag inside the li
-        let clientProfileUpdate = document.querySelector('#dynamic-client-profile a');
-        
-        @if(auth()->check() && auth()->user()->roles->contains('id', 2))
-            clientProfileUpdate.href = "{{ url('admin/users/' . auth()->id()) .'/edit' }}";
-            
-        @else
-            // Optionally, set a fallback URL for non-drivers (or leave as is)
-            // waybillLink.href = "/#"; // or set to some default link
-        @endif
-})
-</script>
-<script>
     document.addEventListener('DOMContentLoaded', function () {
         // Select all inputs whose ID ends with "-cubing_1"
         const inputs = document.querySelectorAll('input[id$="-cubing_1"]');
