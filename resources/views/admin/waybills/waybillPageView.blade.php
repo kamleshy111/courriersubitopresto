@@ -22,7 +22,16 @@
 
 @section('content')
 
-
+<div class="container mb-3">
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">Aperçu du bordereau (nouveau)</h5>
+        </div>
+        <div class="card-body p-2">
+            <iframe src="{{ url('admin/waybill/' . $waybill->id . '/label-preview') }}" title="Label preview" style="width: 100%; min-height: 680px; border: 1px solid #ddd; border-radius: 4px;"></iframe>
+        </div>
+    </div>
+</div>
 
 <div class="container">
 
