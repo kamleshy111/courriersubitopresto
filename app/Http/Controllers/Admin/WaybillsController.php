@@ -107,7 +107,7 @@ class WaybillsController extends CRUDController {
         'user_id' => $request->input('user_id')
     ]);
 } else {
-    
+
     unset($rules['user_id']); // make sure it's not required
     $validator = Validator::make($request->except(['counter', 'save_and_preview']), (new $this->model())->rules);
     $validator_checker = $validator->fails();
@@ -273,7 +273,7 @@ class WaybillsController extends CRUDController {
                 }
 
                 // shipper address extension test
-                
+
                 if ($request->has($i . '.shipper.address_ext')) {
 
                     // Assign it to the current model
@@ -300,10 +300,10 @@ class WaybillsController extends CRUDController {
                         }
                     }
                 }
-                
+
                 // recipient address ext
-                
-                
+
+
                 if ($request->has($i . '.recipient.address_ext')) {
 
                 // Attach to waybill model (if you want to use it later)
@@ -629,7 +629,7 @@ class WaybillsController extends CRUDController {
        abort(403);
 
     }*/
-    
+
     public function show($id)
 {
     $waybill = Waybill::with('user.client', 'shipper', 'recipient')
@@ -2222,7 +2222,7 @@ public function markAsViewed($id)
         ->orderBy('date', 'desc')
         ->get();
     // Log::info('admin waybill search by id', $waybills);
-    Log::info('admin waybill search by id', $waybills->toArray());    
+    Log::info('admin waybill search by id', $waybills->toArray());
 
     return response()->json([
         'waybills' => $waybills->map(function ($wb) {
@@ -2342,8 +2342,8 @@ public function adminByWaybillID_Old_working(Request $request)
                 'name' => $status_name,
                 'color' => $status_color
             ]));*/
-            
-            
+
+
             return [
                 'id' => $wb->id,
                 'soft_id' => $wb->soft_id,
