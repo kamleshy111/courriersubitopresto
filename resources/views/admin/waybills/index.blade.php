@@ -571,162 +571,102 @@
 
                 // Admin dataTable
                 var table = $('#admin_table_id').DataTable({
+                    processing   : true,
+                    serverSide   : true,
+                    responsive   : true,
+                    order: [[0, 'desc']],
+                    ordering     : true,
+                    lengthChange : true,
+                    autoWidth    : false,
+                    pageLength   : 7,
+                    searching    : true,
+                    dom:'lBfrtip',
+                    "ajax" : {
 
-processing   : true,
+                        "url" : '{{ url("admin/waybills-admin-index?waybill-type=" ) }}' + waybillType,
 
-serverSide   : true,
+                        "data": function (d) {
 
-responsive   : true,
+                            d.date_type = $('#date_filter').val();
 
-ordering     : true,   // sorting: false => बदल दिया
+                            d.client_id = $('#client_id').val();
 
-// ⭐ DEFAULT ORDER (Date column DESC)
-order        : [[4, 'desc']],   // 4 = date column index
+                            d.waybill_number = $('#waybill_number').val();
 
-lengthChange : true,
+                        }
 
-autoWidth    : false,
+                    },
+                    "columns" : [
 
-pageLength   : 7,
+                        { data: 'created_at', visible: false },
 
-searching    : true,
+                        // new modified 9.12.24
+                        {
+                            "data" : "soft_id",
+                            searchable: true
+                        },
 
-dom:'lBfrtip',
+                        {
 
-"ajax" : {
+                            "data" : "recipient.name",
 
-    "url" : '{{ url("admin/waybills-admin-index?waybill-type=" ) }}' + waybillType,
+                            "defaultContent": ""
 
-    "data": function (d) {
+                        },
 
-        d.date_type = $('#date_filter').val();
+                        {
 
-        d.client_id = $('#client_id').val();
+                            "data" : "recipient.address",
 
-        d.waybill_number = $('#waybill_number').val();
+                            "defaultContent": ""
 
-    }
+                        },
 
-},
+                        {
 
-"columns" : [
+                            "data" : "delivery_status"
 
+                        },
 
+                        {
 
-    /*{
+                            "data" : "date"
 
-        "data" : "id",
+                        },
 
-        searchable: true
+                            @if(Request::query('waybill') == "false")
 
-    },*/
+                        { data: 'price' },
 
-    // new modified 9.12.24
-    {
-        "data" : "soft_id",
-        searchable: true
-    },
+                            @endif
 
-    {
+                        {
 
-        "data" : "recipient.name",
+                            "data" : 'action',
 
-        "defaultContent": ""
+                            "orderable": false,
 
-    },
+                            "searchable": false
 
-    {
+                        }
 
-        "data" : "recipient.address",
+                    ],
+                    columnDefs: [
+                        {
+                            targets: 0, // Column index (soft_id is 0 here)
+                            render: function (data, type, row, meta) {
+                                const ribbon = row.is_new == 1 ? `<span class="ribbon-new">Nouveau</span>` : '';
+                                return `<div class="ribbon-container">${ribbon}${data}</div>`;
+                            }
+                        }
+                    ],
+                    language: {
 
-        "defaultContent": ""
+                        url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/fr-FR.json',
 
-    },
-
-    // {
-
-    //     "data" : "status"
-
-    // },
-
-    {
-
-        "data" : "delivery_status"
-
-    },
-
-    {
-
-        "data" : "date"
-
-    // data: waybillType === "true" ? "date" : "submission_approval_date"
-
-     /*data: submissionType === "true"
-        ? "submission_approval_date"
-        : "date",
-    render: function (data) {
-        return data ?? ""; // avoid showing null or undefined
-    }*/
-
-
-
-    },
-
-        @if(Request::query('waybill') == "false")
-
-    { data: 'price' },
-
-        @endif
-
-    {
-
-        "data" : 'action',
-
-        "orderable": false,
-
-        "searchable": false
-
-    }
-
-],
-
-
-/*
-columnDefs: [
-    {
-        targets: 0, // First column (soft_id)
-        render: function (data, type, row, meta) {
-            if (row.is_new == 1) {
-                return `<span class="ribbon-new">Nouveau</span> ` + data;
-            }
-            return data;
-        }
-    }
-],
-
-*/
-
-columnDefs: [
-    {
-        targets: 0, // Column index (soft_id is 0 here)
-        render: function (data, type, row, meta) {
-            const ribbon = row.is_new == 1 ? `<span class="ribbon-new">Nouveau</span>` : '';
-            return `<div class="ribbon-container">${ribbon}${data}</div>`;
-        }
-    }
-],
-
-
-
-language: {
-
-    url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/fr-FR.json',
-
-},
-
-buttons: ["copy", "csv", "excel", "pdf", "print", "colvis"]
-
-});
+                    },
+                    buttons: ["copy", "csv", "excel", "pdf", "print", "colvis"]
+                });
 
 
 
