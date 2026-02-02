@@ -263,7 +263,7 @@ also need to check current date data
 
                     <th colspan="2" ondblclick="enableEdit(this)">
                         Total: <span contenteditable="false" id="totalPriceCellHeader" onkeydown="handleEnter(event)" onblur="disableEdit(this)">
-                            {{ number_format(($total ?? 0) * 1.6, 2) }} $
+                            {{ number_format(($total ?? 0) * 0.6, 2) }} $
                         </span>
                     </th>
 
@@ -1664,7 +1664,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
 
 
-                const totalWithMarkup = totalPrice * 1.6;
+                const totalWithMarkup = totalPrice * 0.6;
 
                 if (totalPriceCellHeader) {
                     totalPriceCellHeader.innerText = totalWithMarkup.toFixed(2) + ' $';
@@ -2261,7 +2261,7 @@ function updateTotalPrice() {
         total += price;
     });
 
-    const totalWithMarkup = total * 1.6;
+    const totalWithMarkup = total * 0.6;
     const headerTotalCell = document.getElementById('totalPriceCellHeader');
     const footerTotalCell = document.getElementById('totalPriceCellFooter');
     if (headerTotalCell) headerTotalCell.innerText = totalWithMarkup.toFixed(2) + ' $';
