@@ -206,6 +206,7 @@
                                 {{--<th style="width: 13%; text-align: center!important;">Statut</th>--}}
                                 <th style="width: 13%; text-align: center!important;">Statut de livraison</th>
                                 <th style="width: 13%; text-align: center!important;">Date</th>
+                                <th style="width: 13%; text-align: center!important;">Date de création</th>
                                 @if(Request::query('waybill') == "false" || Request::query('archive') == "true")
                                     <th>Prix</th>
                                 @endif
@@ -311,6 +312,7 @@
         html += '<button class="btn btn-sm btn-success approve-waybill" data-status="1" data-id="' + row.id + '" title="Approve"><i class="fa fa-check"></i></button> ';
         html += '<button class="btn btn-sm btn-danger reject-waybill" data-status="0" data-id="' + row.id + '" title="Reject" style="margin-left:5px;"><i class="fa fa-times"></i></button> ';
         html += '<a class="btn btn-sm btn-primary" target="_blank" href="/admin/waybill/' + row.id + '"><i class="fas fa-eye"></i> Voir Waybill</a> ';
+        html += '<button type="button" class="btn btn-sm btn-warning btn-soft-delete-waybill" title="Supprimer" style="min-width: 2rem; padding: 8px 6px; margin-left: 3px;" data-waybill-id="' + row.id + '"><i class="fa fa-trash"></i></button> ';
         if (row.type == 1) {
             html += '<a class="btn btn-sm btn-danger btn-admin-delete-submission" title="Supprimer" style="width: 2rem; padding: 8px 0; margin-right: 3px; margin-left: 3px;" data-waybill-id="' + row.id + '"><i class="fa fa-trash"></i></a>';
         }
@@ -574,7 +576,7 @@
                     processing   : true,
                     serverSide   : true,
                     responsive   : true,
-                    order: [[0, 'desc']],
+                    order: [[5, 'desc']],
                     ordering     : true,
                     lengthChange : true,
                     autoWidth    : false,
@@ -597,8 +599,6 @@
 
                     },
                     "columns" : [
-
-                        { data: 'created_at', visible: false },
 
                         // new modified 9.12.24
                         {
@@ -633,6 +633,9 @@
                             "data" : "date"
 
                         },
+                        
+                        { data: 'created_at'},
+
 
                             @if(Request::query('waybill') == "false")
 
@@ -1053,6 +1056,41 @@ function updateApprovalStatus1(waybillId, status) {
                         }
                     });
                 });
+
+                // Soft delete (corbeille) — moves waybill to trash, does not remove from DB
+                $('body').on('click', '.btn-soft-delete-waybill', function () {
+                    var waybillId = $(this).data('waybill-id');
+                    Swal.fire({
+                        title: 'Supprimer (corbeille)',
+                        text: 'Êtes-vous sûr de vouloir mettre ce bordereau à la corbeille ? Il pourra être restauré si besoin.',
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonText: 'Oui, supprimer',
+                        cancelButtonText: 'Annuler',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            $.ajax({
+                                url: '/admin/waybills/' + waybillId,
+                                type: 'POST',
+                                data: {
+                                    _token: '{{ csrf_token() }}',
+                                    _method: 'DELETE',
+                                },
+                                success: function (response) {
+                                    var msg = (response && response.message) ? response.message : 'Bordereau supprimé (corbeille) avec succès.';
+                                    Swal.fire({ title: 'Succès', text: msg, icon: 'success' });
+                                    if ($.fn.DataTable.isDataTable('#admin_table_id')) {
+                                        $('#admin_table_id').DataTable().ajax.reload();
+                                    }
+                                },
+                                error: function (xhr) {
+                                    var msg = (xhr.responseJSON && xhr.responseJSON.message) ? xhr.responseJSON.message : 'Erreur lors de la suppression.';
+                                    Swal.fire({ title: 'Erreur', text: msg, icon: 'error' });
+                                },
+                            });
+                        }
+                    });
+                });
             }
 
             if(submissionType && submissionType === "true")
@@ -1219,6 +1257,7 @@ function updateApprovalStatus1(waybillId, status) {
         html += '<a class="btn btn-sm btn-info view-waybill-btn" title="voir" style="width:2rem;padding:8px 0;margin:0 3px;" href="/admin/waybills/' + wb.id + '?waybill=true"><i class="fa fa-eye"></i></a> ';
         html += '<button class="btn btn-sm btn-success approve-waybill" data-status="1" data-id="' + wb.id + '"><i class="fa fa-check"></i></button> ';
         html += '<button class="btn btn-sm btn-danger reject-waybill" data-status="0" data-id="' + wb.id + '" style="margin-left:5px;"><i class="fa fa-times"></i></button> ';
+        html += '<button type="button" class="btn btn-sm btn-warning btn-soft-delete-waybill" title="Supprimer" style="min-width:2rem;padding:8px 6px;margin-left:3px;" data-waybill-id="' + wb.id + '"><i class="fa fa-trash"></i></button> ';
         html += '<a class="btn btn-sm btn-primary" target="_blank" href="/admin/waybill/' + wb.id + '"><i class="fas fa-eye"></i> Voir Waybill</a> ';
         if (wb.type == 1) html += '<a class="btn btn-sm btn-danger btn-admin-delete-submission" data-waybill-id="' + wb.id + '" style="width:2rem;padding:8px 0;margin:0 3px;"><i class="fa fa-trash"></i></a>';
         html += '</div></div>';
@@ -1236,6 +1275,7 @@ function updateApprovalStatus1(waybillId, status) {
                 },
                 delivery_status: renderDeliveryStatus(wb.delivery_status), // HTML or ''
                 date: wb.date || '',
+                created_at: wb.created_at || '',
                 price: (typeof wb.price !== 'undefined') ? wb.price : '',
                 action: buildActionHtml(wb),
                 id: wb.id,
@@ -1319,6 +1359,7 @@ function updateApprovalStatus1(waybillId, status) {
                     html += '<td>' + (o.recipient.address || '') + '</td>';
                     html += '<td>' + (o.delivery_status || '') + '</td>';
                     html += '<td>' + (o.date || '') + '</td>';
+                    html += '<td>' + (o.created_at || '') + '</td>';
                     if (o.price !== '') html += '<td>' + o.price + '</td>';
                     html += '<td>' + (o.action || '') + '</td>';
                     html += '</tr>';

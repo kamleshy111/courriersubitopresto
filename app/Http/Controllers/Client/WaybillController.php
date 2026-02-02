@@ -292,7 +292,8 @@ class WaybillController extends Controller
 
 
             $waybills = Waybill::with('recipient','shipper')
-                ->where('type', $type);
+                ->where('type', $type)
+                ->withoutTrashed();
 
 
             // ->get();
@@ -318,7 +319,13 @@ class WaybillController extends Controller
             return $row->date ? Carbon::parse($row->date)->toFormattedDateString() : null;
 
         })
+        ->editColumn('created_at', function ($row) {
 
+            // Same format as "date" column (e.g. Jan 22, 2026)
+
+            return $row->created_at ? Carbon::parse($row->created_at)->toFormattedDateString() : null;
+
+        })
         ->editColumn('delivery_status', function ($row) {
 
             // Render delivery status badge
@@ -464,6 +471,10 @@ class WaybillController extends Controller
     $button .= '<i class="fa fa-times"></i>'; // Cross icon
 
     $button .= '</button>';
+
+    // Soft delete (corbeille) — for all waybills/submissions
+    $button .= '<button type="button" class="btn btn-sm btn-warning btn-soft-delete-waybill" title="Supprimer" style="min-width: 2rem; padding: 8px 6px; margin-left: 3px;" data-waybill-id="' . $row->id . '"><i class="fa fa-trash"></i></button>';
+
     $button .= '<a class="btn btn-sm btn-primary wabill-pageview"  target="_blank" href="' . url('admin/waybill/' . $row->id) . '"><i class="fas fa-eye"></i> Voir Waybill</a>';
 
 
