@@ -48,7 +48,7 @@ class UsersController extends CRUDController {
     $this->inject['roles'] = $roles;
 
     $this->sync = ['permissions', 'roles'];
-    
+
     if ($request->filled('password')) {
         $inputs = $request->all();
         $inputs['password'] = \Hash::make($request->input('password'));
@@ -79,10 +79,10 @@ class UsersController extends CRUDController {
         abort(403, 'Unauthorized action.');
     }
 
-    
+
     $this->inject['clients'] = \App\Models\Client::where('user_id', $authUser->id)->pluck('name', 'id');
 
-    
+
     if ($authUser->hasRole('admin')) {
         $this->inject['roles'] = \App\Models\Role::pluck('name', 'id');
         $this->inject['permissions'] = \App\Models\Permission::pluck('name', 'id');
@@ -91,7 +91,7 @@ class UsersController extends CRUDController {
         $this->inject['roles'] = collect(); // empty collection
         $this->inject['permissions'] = collect();
     }
-    
+
     $this->inject['isCreate'] = false;
 
     return parent::edit($id, $readonly);
@@ -99,8 +99,8 @@ class UsersController extends CRUDController {
 
 public function update(Request $request, $id)
 {
-    $request->request->remove('id'); 
-    
+    $request->request->remove('id');
+
     $authUser = \Auth::user();
 
     if (!$authUser->hasRole('admin')) {
@@ -140,16 +140,16 @@ function getRedirectUrl()
 
         // Compose email body (simple, safe HTML)
         $body = '<p>Bonjour administrateur,</p>';
-        $body .= '<p>Un utilisateur a demand� une mise � jour de son mot de passe. ';
+        $body .= '<p>Un utilisateur a demandé une mise à jour de son mot de passe. ';
         $body .= 'Cliquez sur le lien ci-dessous pour ouvrir la fiche :</p>';
         $body .= '<p><a href="' . e($url) . '">' . e($url) . '</a></p>';
-        $body .= '<p>Envoy� par : ' . (Auth::check() ? e(Auth::user()->email) : 'Utilisateur non connect�') . '</p>';
+        $body .= '<p>Envoyé par : ' . (Auth::check() ? e(Auth::user()->email) : 'Utilisateur non connecté') . '</p>';
 
         // Recipient (adjust to real admin email or lookup from DB)
         $adminEmail = config('mail.admin_address', 'danybergeron@courriersubitopresto.com');
-        
 
-        
+
+
         // }
 }
 
@@ -158,9 +158,9 @@ public function requestPasswordUpdate()
 {
 //   test wroks fine
     // return response()->json(['ok' => true]);
-    
+
     // wroking block
-    
+
     $user = auth()->user();
 
     // Clients only
@@ -173,7 +173,7 @@ public function requestPasswordUpdate()
 
     /*try {
         Mail::raw(
-            'TEST: Demande de mise � jour du mot de passe pour ',
+            'TEST: Demande de mise à jour du mot de passe pour ',
             function ($message) use ($user) {
                 $message->to('ali2015333061@gmail.com')
                         ->subject('TEST - Password update request');
@@ -195,12 +195,12 @@ public function requestPasswordUpdate()
             'message' => 'Email failed'
         ], 500);
     }*/
-    
+
     try {
     $editUrl = url('/admin/users/' . $user->id . '/edit');
 
     $messageText =
-        "Demande de mise � jour du mot de passe du client\n\n" .
+        "Demande de mise à jour du mot de passe du client\n\n" .
         "Utilisateur: " . $user->name . "\n" .
         "Email: " . $user->email . "\n\n" .
         "Lien pour modifier le mot de passe:\n" .
@@ -211,7 +211,7 @@ public function requestPasswordUpdate()
                   to('danybergeron@courriersubitopresto.com')
                 ->bcc('ali2015333061@gmail.com')
                 // to('ali2015333061@gmail.com')
-                ->subject('Demande de mise � jour du mot de passe');
+                ->subject('Demande de mise à jour du mot de passe');
     });
 
     return response()->json([
