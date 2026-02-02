@@ -255,14 +255,16 @@ also need to check current date data
                     </th>
 
 
-                    <th colspan="2">Date:
+                    <th colspan="3">Date:
 
                         <input type="date" id="filterDate" value="{{ $currentDate }}">
 
                     </th>
 
-                    <th colspan="3" ondblclick="enableEdit(this)">
-                        Total: <span contenteditable="false" id="totalPriceCellHeader" onkeydown="handleEnter(event)" onblur="disableEdit(this)">{{ number_format($total ?? 0, 2) }} $</span>
+                    <th colspan="2" ondblclick="enableEdit(this)">
+                        Total: <span contenteditable="false" id="totalPriceCellHeader" onkeydown="handleEnter(event)" onblur="disableEdit(this)">
+                            {{ number_format(($total ?? 0) * 1.6, 2) }} $
+                        </span>
                     </th>
 
                 </tr>
@@ -1662,8 +1664,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
 
 
+                const totalWithMarkup = totalPrice * 1.6;
 
-                if (totalPriceCellHeader) totalPriceCellHeader.innerText = totalPrice.toFixed(2) + ' $';
+                if (totalPriceCellHeader) {
+                    totalPriceCellHeader.innerText = totalWithMarkup.toFixed(2) + ' $';
+                }
                 if (totalPriceCellFooter) totalPriceCellFooter.innerText = totalPrice.toFixed(2) + ' $';
 
                 // attachEditableListeners();
@@ -2256,9 +2261,10 @@ function updateTotalPrice() {
         total += price;
     });
 
+    const totalWithMarkup = total * 1.6;
     const headerTotalCell = document.getElementById('totalPriceCellHeader');
     const footerTotalCell = document.getElementById('totalPriceCellFooter');
-    if (headerTotalCell) headerTotalCell.innerText = total.toFixed(2) + ' $';
+    if (headerTotalCell) headerTotalCell.innerText = totalWithMarkup.toFixed(2) + ' $';
     if (footerTotalCell) footerTotalCell.innerText = total.toFixed(2) + ' $';
 }
 
