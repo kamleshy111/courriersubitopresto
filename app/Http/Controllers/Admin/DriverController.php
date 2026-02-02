@@ -476,7 +476,7 @@ public function getDriverWaybills(Request $request, $id)
         // Fetch users who have the role with id = 3
         $users = User::whereHas('roles', function ($query) {
             $query->where('id', 3);
-        })->get();
+        })->orderBy('id', 'ASC')->get();
 
         return view('admin.drivers.driver-list', compact('users'));
     }
