@@ -42,6 +42,22 @@
     
 @endif
 
+@push('js')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        let waybillLink = document.querySelector('#dynamic-waybill-link a');
+        let waybillInprogress = document.querySelector('#dynamic-waybill-inprogress a');
+        let waybillPickedup = document.querySelector('#dynamic-waybill-pickedup a');
+        let waybillDelivered = document.querySelector('#dynamic-waybill-delivered a');
+        @if(auth()->check() && auth()->user()->roles->contains('id', 3))
+            if (waybillLink) waybillLink.href = "{{ url('admin/driver-summary-table/' . auth()->id()) }}";
+            if (waybillInprogress) waybillInprogress.href = "{{ url('admin/driver-waybill/' . auth()->id()) }}/in-progress";
+            if (waybillPickedup) waybillPickedup.href = "{{ url('admin/driver-waybill/' . auth()->id()) }}/pickedup";
+            if (waybillDelivered) waybillDelivered.href = "{{ url('admin/driver-waybill/' . auth()->id()) }}/delivered";
+        @endif
+    });
+</script>
+@endpush
 
 
 

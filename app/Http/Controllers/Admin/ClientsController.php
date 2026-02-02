@@ -44,20 +44,20 @@ class ClientsController extends CRUDController {
             
             // new test
             $this->middleware(function($request, $next) {
-    if (\Laratrust::hasRole('admin')) {
-        return $next($request);
-    }
+                if (\Laratrust::hasRole('admin')) {
+                    return $next($request);
+                }
 
-    $client = Client::findOrFail($request->route()->parameter('client'));
+                $client = Client::findOrFail($request->route()->parameter('client'));
 
-    // Client-role users can only access client records they own
-    abort_if(
-        $client->user_id !== auth()->id(),
-        403
-    );
+                $isOwner = (int) $client->user_id === (int) auth()->id();
 
-    return $next($request);
-});
+                $belongsToClient = auth()->user()->client_id && (int) auth()->user()->client_id === (int) $client->id;
+                
+                abort_if(!$isOwner && !$belongsToClient, 403);
+                
+                return $next($request);
+            });
 
         }
 
