@@ -31,7 +31,7 @@ Route::get('/app/download', [\App\Http\Controllers\DownloadController::class, 'i
 Route::post('/update-cell', [\App\Http\Controllers\Admin\DriverController::class, 'driverWaybillUpdate'])->name('driver.waybill.update');
 
 Route::get('/admin/my-profile', function () {
-    return redirect()->route('admin.profile.index');
+    return redirect()->route('admin.clients.edit',auth()->user()->client_id);
 })->name('admin.client.profile')->middleware('auth');
 
 // update user profile for clients

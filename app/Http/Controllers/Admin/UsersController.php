@@ -48,7 +48,6 @@ class UsersController extends CRUDController {
     $this->inject['roles'] = $roles;
 
     $this->sync = ['permissions', 'roles'];
-
     
     if ($request->filled('password')) {
         $inputs = $request->all();
@@ -141,10 +140,10 @@ function getRedirectUrl()
 
         // Compose email body (simple, safe HTML)
         $body = '<p>Bonjour administrateur,</p>';
-        $body .= '<p>Un utilisateur a demandé une mise à jour de son mot de passe. ';
+        $body .= '<p>Un utilisateur a demandï¿½ une mise ï¿½ jour de son mot de passe. ';
         $body .= 'Cliquez sur le lien ci-dessous pour ouvrir la fiche :</p>';
         $body .= '<p><a href="' . e($url) . '">' . e($url) . '</a></p>';
-        $body .= '<p>Envoyé par : ' . (Auth::check() ? e(Auth::user()->email) : 'Utilisateur non connecté') . '</p>';
+        $body .= '<p>Envoyï¿½ par : ' . (Auth::check() ? e(Auth::user()->email) : 'Utilisateur non connectï¿½') . '</p>';
 
         // Recipient (adjust to real admin email or lookup from DB)
         $adminEmail = config('mail.admin_address', 'danybergeron@courriersubitopresto.com');
@@ -174,7 +173,7 @@ public function requestPasswordUpdate()
 
     /*try {
         Mail::raw(
-            'TEST: Demande de mise à jour du mot de passe pour ',
+            'TEST: Demande de mise ï¿½ jour du mot de passe pour ',
             function ($message) use ($user) {
                 $message->to('ali2015333061@gmail.com')
                         ->subject('TEST - Password update request');
@@ -201,7 +200,7 @@ public function requestPasswordUpdate()
     $editUrl = url('/admin/users/' . $user->id . '/edit');
 
     $messageText =
-        "Demande de mise à jour du mot de passe du client\n\n" .
+        "Demande de mise ï¿½ jour du mot de passe du client\n\n" .
         "Utilisateur: " . $user->name . "\n" .
         "Email: " . $user->email . "\n\n" .
         "Lien pour modifier le mot de passe:\n" .
@@ -212,7 +211,7 @@ public function requestPasswordUpdate()
                   to('danybergeron@courriersubitopresto.com')
                 ->bcc('ali2015333061@gmail.com')
                 // to('ali2015333061@gmail.com')
-                ->subject('Demande de mise à jour du mot de passe');
+                ->subject('Demande de mise ï¿½ jour du mot de passe');
     });
 
     return response()->json([
