@@ -882,6 +882,21 @@ class WaybillsController extends CRUDController {
         }
     }
 
+    /**
+     * Soft delete waybill (corbeille). Waybill model uses SoftDeletes so delete() sets deleted_at.
+     * Returns JSON for AJAX requests.
+     */
+    public function destroy($id)
+    {
+        $waybill = Waybill::findOrFail($id);
+        $waybill->delete(); // soft delete
+
+        if (request()->wantsJson() || request()->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Bordereau supprimé (corbeille) avec succès.']);
+        }
+        return "true";
+    }
+
     public function deleteRejectedSubmission($id)
     {
         $waybill = Waybill::find($id);
@@ -2450,7 +2465,8 @@ public function adminByWaybillID(Request $request)
                 'recipient_address' => $wb->recipient->address ?? 'N/A',
                 'shipper_name' => $wb->shipper->name ?? 'N/A',
                 'shipper_address' => $wb->shipper->address ?? 'N/A',
-                'date' => $wb->date ? $wb->date->format('Y-m-d') : null,
+                'date' => $wb->date ? \Carbon\Carbon::parse($wb->date)->toFormattedDateString() : null,
+                'created_at' => $wb->created_at ? \Carbon\Carbon::parse($wb->created_at)->toFormattedDateString() : null,
                 'delivery_status' => $wb->delivery_status,
                 'type' => $wb->type,
             ];
