@@ -69,7 +69,12 @@ class WaybillsController extends CRUDController {
         Log::info('Store request data:', $request->all());
         $waybillType = "true";
         $new = $request->all();
-        $leval = $request->input('leval');
+
+        if ($request->boolean('save_and_preview')) {
+            $request->validate(['label_count' => 'required|integer|min:1|max:100']);
+        }
+        $labelCount = max(1, min(100, (int) $request->input('label_count', 1)));
+
         for($i = 0; $i <= $request->input('counter', 0); $i++) {
             // if (isset($request[$i]['round_trip_1']) && $request[$i]['round_trip_1'] == '1')
             //     {
@@ -110,7 +115,7 @@ class WaybillsController extends CRUDController {
 } else {
 
     unset($rules['user_id']); // make sure it's not required
-    $validator = Validator::make($request->except(['counter', 'save_and_preview', 'leval']), (new $this->model())->rules);
+    $validator = Validator::make($request->except(['counter', 'save_and_preview', 'label_count']), (new $this->model())->rules);
     $validator_checker = $validator->fails();
     // Fix Log line
     Log::info('Validation checker:', ['value' => $validator_checker]);
@@ -421,7 +426,7 @@ class WaybillsController extends CRUDController {
             }
 
             if ($saveAndPreview && $firstWaybillId) {
-                return redirect()->route('admin.waybill.label-preview', ['id' => $firstWaybillId, 'leval' => $leval]);
+                return redirect()->route('admin.waybill.label-preview', ['id' => $firstWaybillId, 'label_count' => $labelCount]);
             }
 
             if(!empty($waybillsToSend)) {
@@ -2083,11 +2088,8 @@ public function waybillLabelPreview(Request $request, $id)
     $shipper = $waybill->shipper;
     $recipient = $waybill->recipient;
 
-    // Modal se aayi value
-    $leval = $request->query('leval', 1); // default 1
-
-    // Labels ke liye ek array bana lo (sirf loop ke liye)
-    $labels = range(1, $leval);
+    $labelCount = max(1, min(100, (int) $request->query('label_count', 1)));
+    $labels = range(1, $labelCount);
 
     return view('admin.waybills.waybillLabelPreview', compact('waybill', 'shipper', 'recipient', 'labels'));
 }
@@ -2098,7 +2100,7 @@ public function labelPreviewPdf(Request $request, $id)
     $waybill = Waybill::with(['shipper', 'recipient', 'user.client'])->findOrFail($id);
     $shipper = $waybill->shipper;
     $recipient = $waybill->recipient;
-    $leval = (int) $request->query('leval', 1);
+    $labelCount = max(1, min(100, (int) $request->query('label_count', 1)));
 
     // $html = view('admin.waybills.waybillLabelPdf', compact('waybill', 'shipper', 'recipient'))->render();
 
@@ -2110,7 +2112,7 @@ public function labelPreviewPdf(Request $request, $id)
         'margin_bottom' => 3,
     ]);
 
-    for ($i = 1; $i <= $leval; $i++) {
+    for ($i = 1; $i <= $labelCount; $i++) {
         $pdf->AddPage();
         $html = view(
             'admin.waybills.waybillLabelPdf',
@@ -2118,8 +2120,8 @@ public function labelPreviewPdf(Request $request, $id)
                 'waybill'   => $waybill,
                 'shipper'   => $shipper,
                 'recipient' => $recipient,
-                'pageNo'    => $i,   // current
-                'totalPage' => $leval,    // total
+                'pageNo'    => $i,
+                'totalPage' => $labelCount,
             ]
         )->render();
         $pdf->WriteHTML($html);

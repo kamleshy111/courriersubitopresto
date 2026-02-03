@@ -6,7 +6,7 @@
 
     @section('title', 'Bordereaux' . ': ' . (is_object(@$model) ? 'modification' : 'création'))
 
-@elseif(Request::query('waybill') == "true")
+@elseif(Request::query('waybill') == "false")
 
     @section('title', 'Soumissions' . ': ' . (is_object(@$model) ? 'modification' : 'création'))
 
@@ -78,7 +78,7 @@
 
     {!! Form::hidden('counter', 0) !!}
 
-    <input type="hidden" name="leval" id="leval_input" value="1">
+    <input type="hidden" name="label_count" id="label_count_input" value="1">
 
 
     @include('admin.' . $name . '.form')
@@ -151,8 +151,8 @@
                     <h5 class="modal-title">Waybill aperçu</h5>
                 </div>
                 <div class="modal-body">
-                    <label for="modal_leval">Nombre d'étiquettes :</label>
-                    <input type="number" class="form-control" id="modal_leval" placeholder="Entrez le nombre d'étiquettes" min="1" required>
+                    <label for="modal_label_count">Nombre d'étiquettes :</label>
+                    <input type="number" class="form-control" id="modal_label_count" placeholder="Entrez le nombre d'étiquettes (1-100)" min="1" max="100" required>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-success" onclick="submitForm()">
@@ -228,15 +228,14 @@
 
 
         function submitForm() {
-            let leval = document.getElementById('modal_leval').value;
-
-            if (!leval || leval < 1) {
-                alert('Please enter a valid number');
+            var raw = document.getElementById('modal_label_count').value;
+            var labelCount = parseInt(raw, 10);
+            if (isNaN(labelCount) || labelCount < 1 || labelCount > 100) {
+                alert('Veuillez entrer un nombre d\'étiquettes entre 1 et 100.');
                 return;
             }
-
-            document.getElementById('leval_input').value = leval;
-
+            document.getElementById('label_count_input').value = labelCount;
+            $('#previewModal').modal('hide');
             document.getElementById('realSubmitBtn').click();
         }
 
