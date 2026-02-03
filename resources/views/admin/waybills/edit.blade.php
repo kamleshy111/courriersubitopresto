@@ -78,6 +78,7 @@
 
     {!! Form::hidden('counter', 0) !!}
 
+    <input type="hidden" name="leval" id="leval_input" value="1">
 
 
     @include('admin.' . $name . '.form')
@@ -123,7 +124,8 @@
         ]) !!}
 
                 @if (!isset($model))
-                    <button type="submit" name="save_and_preview" value="1" class="btn btn-lg btn-info ml-2">Sauvegarder et aperçu</button>
+                    <button type="submit" id="realSubmitBtn" name="save_and_preview" value="1" class="btn btn-lg btn-info ml-2 d-none">Sauvegarder et aperçu</button>
+                    <button type="button" id="savePreviewBtn" class="btn btn-lg btn-info ml-2"> Sauvegarder et aperçu</button>
                 @endif
 
             @else
@@ -141,6 +143,26 @@
     </div>
 
     {!! Form::close() !!}
+
+    <div class="modal fade" id="previewModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Waybill aperçu</h5>
+                </div>
+                <div class="modal-body">
+                    <label for="modal_leval">Nombre d'étiquettes :</label>
+                    <input type="number" class="form-control" id="modal_leval" placeholder="Entrez le nombre d'étiquettes" min="1" required>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" onclick="submitForm()">
+                        Confirmer et enregistrer
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
 @stop
 
@@ -191,6 +213,35 @@
             default_client: @json(Auth::user()->client)
 
         }
+
+        document.getElementById('savePreviewBtn').addEventListener('click', function () {
+
+            let form = document.getElementById('waybills-form');
+
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            $('#previewModal').modal('show');
+        });
+
+
+        function submitForm() {
+            let leval = document.getElementById('modal_leval').value;
+
+            if (!leval || leval < 1) {
+                alert('Please enter a valid number');
+                return;
+            }
+
+            document.getElementById('leval_input').value = leval;
+
+            document.getElementById('realSubmitBtn').click();
+        }
+
+
+
 
     </script>
 

@@ -15,11 +15,12 @@
     align-items: center;
     justify-content: center;
     min-height: 60vh;
+    margin: 20px 0;
 }
 .waybill-label-preview .label {
     width: 4in;
     max-width: 100%;
-    min-height: 6in;
+    min-height: 5.5in;
     border: 1px solid #000;
     padding: 0;
     box-sizing: border-box;
@@ -79,10 +80,11 @@
     letter-spacing: 0.5px;
 }
 .waybill-label-preview .address-section {
-    min-height: 2.6in;
+    min-height: 2.0in;
     padding: 10px;
     position: relative;
     border-bottom: 2px solid #000;
+    padding-top: 21px;
 }
 .waybill-label-preview .address-top-row {
     display: flex;
@@ -92,10 +94,11 @@
     width: 100%;
 }
 .waybill-label-preview .return-address {
-    font-size: 11px;
+    font-size: 15px;
     line-height: 1.2;
     flex: 1;
     min-width: 0;
+    font-weight: bold
 }
 .waybill-label-preview .to-address {
     margin-top: 20px;
@@ -155,95 +158,128 @@
     background: #0056b3;
     color: #fff;
 }
+
+/* Print & PDF ke liye */
+.page-break {
+    page-break-after: always;
+}
+
+/* Last page ke baad blank page na aaye */
+.page-break:last-child {
+    page-break-after: auto;
+}
+
+@media print {
+    .page-break {
+        page-break-after: always;
+    }
+}
+
 </style>
 @endpush
 
 @section('content')
-<div class="container d-flex justify-content-center">
-    <div class="waybill-label-preview">
-        <div class="label">
-            <div class="header">
-                <div class="header-left">@include('admin.waybills.partials.waybill-logo')</div>
-                <div class="header-middle">
-                    US POSTAGE<br>
-                    PAID<br>
-                    {{ $waybill->date ? \Carbon\Carbon::parse($waybill->date)->format('m/d/Y') : date('m/d/Y') }}<br>
-                    @if($shipper && $shipper->postal_code)
-                        From {{ preg_replace('/\s+/', '', $shipper->postal_code) }}<br>
-                    @endif
-                    @if($waybill->status)
-                        <strong>{{ strtoupper(str_replace('_', ' ', $waybill->status)) }}</strong><br>
-                    @endif
-                </div>
-                <div class="header-right">
-                    <div class="header-right-text">
-                        <div>
-                            <strong>Courier</strong><br>
-                            #{{ str_pad($waybill->id, 10, '0', STR_PAD_LEFT) }}<br>
-                            @if($waybill->description)
-                                {{ \Str::limit($waybill->description, 25) }}<br>
-                            @endif
-                            @if($waybill->weight_1)
-                                Wt: {{ $waybill->weight_1 }}<br>
-                            @endif
-                            @if($waybill->total)
-                                Total: {{ $waybill->total }}<br>
-                            @endif
-                            @if($waybill->who_pay)
-                                Pay: {{ ucfirst($waybill->who_pay) }}
-                            @endif
+    <div class="d-flex justify-content-end mb-3">
+        <a href="{{ route('admin.waybill.label-preview.pdf', [
+            'id' => $waybill->id,
+            'leval' => count($labels)
+        ]) }}"
+        target="_blank"
+        class="btn btn-primary print-btn">
+            Générer PDF
+        </a>
+    </div>
+    @foreach($labels as $label)
+
+        <div class="page-break">
+            <div class="container d-flex justify-content-center">
+
+                <div class="waybill-label-preview">
+                    <div class="label">
+                        <div class="header">
+                            <div class="header-left">@include('admin.waybills.partials.waybill-logo')</div>
+                            <div class="header-middle">
+                                US POSTAGE<br>
+                                PAID<br>
+                                {{ $waybill->date ? \Carbon\Carbon::parse($waybill->date)->format('m/d/Y') : date('m/d/Y') }}<br>
+                                @if($shipper && $shipper->postal_code)
+                                    From {{ preg_replace('/\s+/', '', $shipper->postal_code) }}<br>
+                                @endif
+                                @if($waybill->status)
+                                    <strong>{{ strtoupper(str_replace('_', ' ', $waybill->status)) }}</strong><br>
+                                @endif
+                            </div>
+                            <div class="header-right">
+                                <div class="header-right-text">
+                                    <div>
+                                        <strong>Courier</strong><br>
+                                        #{{ str_pad($waybill->id, 10, '0', STR_PAD_LEFT) }}<br>
+                                        @if($waybill->description)
+                                            {{ \Str::limit($waybill->description, 25) }}<br>
+                                        @endif
+                                        @if($waybill->weight_1)
+                                            Wt: {{ $waybill->weight_1 }}<br>
+                                        @endif
+                                        @if($waybill->total)
+                                            Total: {{ $waybill->total }}<br>
+                                        @endif
+                                        @if($waybill->who_pay)
+                                            Pay: {{ ucfirst($waybill->who_pay) }}
+                                        @endif
+                                    </div>
+                                    <div class="text-end">
+                                        {{ $waybill->created_at ? $waybill->created_at->format('m/d/Y H:i') : '' }}
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="text-end">
-                            {{ $waybill->created_at ? $waybill->created_at->format('m/d/Y H:i') : '' }}
+
+                        <div class="nir-line">(NIR): R5608402</div>
+
+                        <div class="service">
+                            BORDEREAU / WAYBILL
+                        </div>
+
+                        <div class="address-section">
+                            <div class="address-top-row">
+                                <div class="return-address">
+                                    @if($shipper)
+                                        {{ $shipper->name ?? 'N/A' }}<br>
+                                        {{ $shipper->address ?? '' }}{{ !empty($shipper->address_ext) ? ', ' . $shipper->address_ext : '' }}<br>
+                                        {{ $shipper->city_name ?? '' }} {{ $shipper->city_state ?? '' }} {{ $shipper->postal_code ?? '' }}
+                                    @else
+                                        —
+                                    @endif
+                                </div>
+                                <div class="right-codes">
+                                    <div class="code-0001">{{ $waybill->user && $waybill->user->client ? $waybill->user->client->prefix . str_pad($waybill->soft_id, 6, '0', STR_PAD_LEFT) : str_pad($waybill->soft_id ?? $waybill->id, 6, '0', STR_PAD_LEFT) }}</div>
+                                    {{-- <div class="code-c005">C{{ str_pad($waybill->id, 4, '0', STR_PAD_LEFT) }}</div> --}}
+                                    <div class="code-c005">{{ $loop->iteration }}/{{ $loop->count }}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="tracking-section">
+                            <div class="tracking-title">TRACKING #</div>
+                            <div class="tracking-number">
+                                {{ str_pad($waybill->id, 14, '0', STR_PAD_LEFT) }}
+                            </div>
+                            <div class="to-address">
+                                @if($recipient)
+                                    {{ strtoupper($recipient->name ?? 'N/A') }}<br>
+                                    {{ strtoupper($recipient->address ?? '') }}{{ !empty($recipient->address_ext) ? ', ' . strtoupper($recipient->address_ext) : '' }}<br>
+                                    {{ strtoupper($recipient->city_name ?? '') }} {{ strtoupper($recipient->city_state ?? '') }} {{ $recipient->postal_code ?? '' }}
+                                @else
+                                    —
+                                @endif
+                            </div>
                         </div>
                     </div>
-                </div>
-            </div>
 
-            <div class="nir-line">(NIR): R5608402</div>
 
-            <div class="service">
-                BORDEREAU / WAYBILL
-            </div>
+                </div>
 
-            <div class="address-section">
-                <div class="address-top-row">
-                    <div class="return-address">
-                        @if($shipper)
-                            {{ $shipper->name ?? 'N/A' }}<br>
-                            {{ $shipper->address ?? '' }}{{ !empty($shipper->address_ext) ? ', ' . $shipper->address_ext : '' }}<br>
-                            {{ $shipper->city_name ?? '' }} {{ $shipper->city_state ?? '' }} {{ $shipper->postal_code ?? '' }}
-                        @else
-                            —
-                        @endif
-                    </div>
-                    <div class="right-codes">
-                        <div class="code-0001">{{ $waybill->user && $waybill->user->client ? $waybill->user->client->prefix . str_pad($waybill->soft_id, 6, '0', STR_PAD_LEFT) : str_pad($waybill->soft_id ?? $waybill->id, 6, '0', STR_PAD_LEFT) }}</div>
-                        <div class="code-c005">C{{ str_pad($waybill->id, 4, '0', STR_PAD_LEFT) }}</div>
-                    </div>
-                </div>
-                <div class="to-address">
-                    @if($recipient)
-                        {{ strtoupper($recipient->name ?? 'N/A') }}<br>
-                        {{ strtoupper($recipient->address ?? '') }}{{ !empty($recipient->address_ext) ? ', ' . strtoupper($recipient->address_ext) : '' }}<br>
-                        {{ strtoupper($recipient->city_name ?? '') }} {{ strtoupper($recipient->city_state ?? '') }} {{ $recipient->postal_code ?? '' }}
-                    @else
-                        —
-                    @endif
-                </div>
-            </div>
-
-            <div class="tracking-section">
-                <div class="tracking-title">TRACKING #</div>
-                <div class="tracking-number">
-                    {{ str_pad($waybill->id, 14, '0', STR_PAD_LEFT) }}
-                </div>
             </div>
         </div>
-
-        <p style="text-align:center; margin-top:10px;">
-            <a href="{{ route('admin.waybill.label-preview.pdf', $waybill->id) }}" target="_blank" class="print-btn" style="text-decoration:none; color:inherit;">Générer PDF</a>
-        </p>
-    </div>
-</div>
+    @endforeach
 @endsection

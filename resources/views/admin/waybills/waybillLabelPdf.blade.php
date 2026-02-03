@@ -78,7 +78,8 @@ td { vertical-align: top; }
                     </td>
                     <td style="text-align: right; width: 35%;">
                         <span style="font-size: 12pt; font-weight: bold;">{{ $waybill->user && $waybill->user->client ? $waybill->user->client->prefix . str_pad($waybill->soft_id, 6, '0', STR_PAD_LEFT) : str_pad($waybill->soft_id ?? $waybill->id, 6, '0', STR_PAD_LEFT) }}</span><br>
-                        <span style="font-size: 10pt; font-weight: bold; border: 1px solid #000; padding: 1px 3px;">C{{ str_pad($waybill->id, 4, '0', STR_PAD_LEFT) }}</span>
+                        {{-- <span style="font-size: 10pt; font-weight: bold; border: 1px solid #000; padding: 1px 3px;">C{{ str_pad($waybill->id, 4, '0', STR_PAD_LEFT) }}</span> --}}
+                        <span style="font-size: 10pt; font-weight: bold; border: 1px solid #000; padding: 1px 3px;">{{ $pageNo }}/{{ $totalPage }}</span>
                     </td>
                 </tr>
                 <tr>
