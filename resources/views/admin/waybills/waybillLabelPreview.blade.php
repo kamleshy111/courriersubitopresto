@@ -1,4 +1,5 @@
-@extends('adminlte::page')
+{{-- @extends('adminlte::page') --}}
+@extends('adminlte::iframe')
 
 @section('title', 'Aperçu bordereau #' . $waybill->id)
 
