@@ -276,20 +276,25 @@
                             <div class="service">BORDEREAU / WAYBILL</div>
 
                             <div class="address-section">
-                                <div class="address-top-row">
-                                    <div class="return-address">
-                                        @if($shipper)
-                                            {{ $shipper->name ?? 'N/A' }}<br>
-                                            {{ $shipper->address ?? '' }}{{ !empty($shipper->address_ext) ? ', ' . $shipper->address_ext : '' }}<br>
-                                            {{ $shipper->city_name ?? '' }} {{ $shipper->city_state ?? '' }} {{ $shipper->postal_code ?? '' }}
-                                        @else
-                                            —
-                                        @endif
+                                <div class="address-top-row-main">
+                                    <div class="address-top-row">
+                                        <div class="return-address">
+                                            @if($shipper)
+                                                {{ $shipper->name ?? 'N/A' }}<br>
+                                                {{ $shipper->address ?? '' }}{{ !empty($shipper->address_ext) ? ', ' . $shipper->address_ext : '' }}<br>
+                                                {{ $shipper->city_name ?? '' }} {{ $shipper->city_state ?? '' }} {{ $shipper->postal_code ?? '' }}
+                                            @else
+                                                —
+                                            @endif
+                                        </div>
+                                        <div class="right-codes">
+                                            <div class="code-0001">{{ $waybill->user && $waybill->user->client ? $waybill->user->client->prefix . str_pad($waybill->soft_id, 6, '0', STR_PAD_LEFT) : str_pad($waybill->soft_id ?? $waybill->id, 6, '0', STR_PAD_LEFT) }}</div>
+                                            <div class="code-c005">{{ $loop->iteration }}/{{ $loop->count }}</div>
+                                        </div>
                                     </div>
-                                    <div class="right-codes">
-                                        <div class="code-0001">{{ $waybill->user && $waybill->user->client ? $waybill->user->client->prefix . str_pad($waybill->soft_id, 6, '0', STR_PAD_LEFT) : str_pad($waybill->soft_id ?? $waybill->id, 6, '0', STR_PAD_LEFT) }}</div>
-                                        <div class="code-c005">{{ $loop->iteration }}/{{ $loop->count }}</div>
-                                    </div>
+                                </div>
+                                <div class="tracking-section">
+                                    <p>{{ $waybill->shipper_note ?? '' }}</p>
                                 </div>
                             </div>
 

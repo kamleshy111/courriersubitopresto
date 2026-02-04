@@ -481,7 +481,7 @@ class WaybillController extends Controller
 
             if ($row->type == 1) {
 
-                $button .= '<a class="btn btn-sm btn-danger btn-admin-delete-submission" title="Supprimer" style="width: 2rem; padding: 8px 0; margin-left: 3px;" data-waybill-id="' . $row->id . '"><i class="fa fa-trash"></i></a>';
+                // $button .= '<a class="btn btn-sm btn-danger btn-admin-delete-submission" title="Supprimer" style="width: 2rem; padding: 8px 0; margin-left: 3px;" data-waybill-id="' . $row->id . '"><i class="fa fa-trash"></i></a>';
                 // $button .= '<a class="btn btn-sm btn-primary prix" data-id="' . $row->id . '" style="background-color:#FFD700; color: black;" ><i class="fas fa-dollar-sign"></i> prix</a>';
 
             }

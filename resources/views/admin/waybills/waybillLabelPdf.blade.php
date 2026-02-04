@@ -7,6 +7,12 @@ body { margin: 0; padding: 0; font-family: Arial, Helvetica, sans-serif; font-si
 table { border-collapse: collapse; page-break-inside: avoid; }
 td { vertical-align: top; }
 .logo-cell img { max-width: 16mm; max-height: 12mm; object-fit: contain; }
+.tracking-section {
+    padding: 0.06in 0.1in;
+    border-top: 1px solid #ddd;
+    flex-shrink: 0;
+    margin: 10px 0;
+}
 </style>
 </head>
 <body style="margin:0; padding:0;">
@@ -62,9 +68,19 @@ td { vertical-align: top; }
                         <span style="font-size: 10pt; font-weight: bold; border: 1px solid #000; padding: 0.5mm 1.5mm;">{{ $pageNo }}/{{ $totalPage }}</span>
                     </td>
                 </tr>
+
             </table>
         </td>
     </tr>
+    @if($waybill && $waybill->shipper_note)
+        <tr  style="margin-top: 10px;">
+            <td colspan="4" style="padding: 2mm; border-top: 1px solid #ccc;">
+                    <div style="font-size: 10pt;">
+                    <span style="font-weight: bold;">Note:-</span> {{ $waybill->shipper_note ?? '' }}
+                </div>
+            </td>
+        </tr>
+    @endif
     <!-- Tracking + Recipient (to-address) -->
     <tr>
         <td colspan="4" style="padding: 2mm; border-top: 1px solid #ccc;">
