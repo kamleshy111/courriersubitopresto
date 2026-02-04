@@ -447,9 +447,9 @@ class WaybillController extends Controller
 
             $button .= '<div class="col-md-12 col-sm-6">';
 
-            $button .= '<a class="btn btn-sm btn-info waybill-edit" title="modifier" style="width: 2rem; padding: 8px 0; background-color:#054AFA;" href="' . url('admin/waybills/' . $row->id . '/edit?waybill=' . request()->query('waybill-type')) . '"><i class="fa fa-edit"></i></a>';
+            $button .= '<a class="btn btn-sm btn-info waybill-edit" title="modifier" style="width: 2rem; background-color:#054AFA;" href="' . url('admin/waybills/' . $row->id . '/edit?waybill=' . request()->query('waybill-type')) . '"><i class="fa fa-edit"></i></a>';
 
-            $button .= '<a class="btn btn-sm btn-info view-waybill-btn" title="voir la feuille de route" style="width: 2rem; padding: 8px 0; margin-right: 3px; margin-left: 3px;" href="' . url('admin/waybills/' . $row->id . '?waybill=' . request()->query('waybill-type')) . '"><i class="fa fa-eye"></i></a>';
+            $button .= '<a class="btn btn-sm btn-info view-waybill-btn" title="voir la feuille de route" style="width: 2rem; margin-left: 3px;" href="' . url('admin/waybills/' . $row->id . '?waybill=' . request()->query('waybill-type')) . '"><i class="fa fa-eye"></i></a>';
 
             // $button .= '<button class="btn btn-sm btn-success btn-approve-waybill" data-id="' . $row->id . '">Approve</button>';
 
@@ -457,7 +457,7 @@ class WaybillController extends Controller
 
             // $button .= '<button class="btn btn-sm btn-danger reject-waybill data-id="' . $row->id . '">Reject</button>';
 
-            $button .= '<button class="btn btn-sm btn-success approve-waybill" data-status="1" data-id="' . $row->id . '" title="Approve">';
+            $button .= '<button class="btn btn-sm btn-success approve-waybill" data-status="1" data-id="' . $row->id . '" title="Approve" style="width: 2rem; margin-left: 3px;">';
             // $button .= '<a class="btn btn-sm btn-info view-waybill-btn" title="voir la feuille de route" style="width: 2rem; padding: 8px 0; margin-right: 3px; margin-left: 3px;" href="' . url('admin/waybills/' . $row->id . '?waybill=' . request()->query('waybill-type')) . '"><i class="fa fa-eye"></i></a>';
             // $button .= '<a class="btn btn-sm btn-primary" style="background-color:#FFD700; color: black;" ><i class="fas fa-euro-sign"></i> prix</a>';
 
@@ -466,21 +466,22 @@ class WaybillController extends Controller
 
     $button .= '</button>';
 
-    $button .= '<button class="btn btn-sm btn-danger reject-waybill" data-status="0" data-id="' . $row->id . '" title="Reject" style="margin-left: 5px;">';
+    $button .= '<button class="btn btn-sm btn-danger reject-waybill" data-status="0" data-id="' . $row->id . '" title="Reject" style="width: 2rem; margin-left: 3px;">';
 
     $button .= '<i class="fa fa-times"></i>'; // Cross icon
 
     $button .= '</button>';
 
     // Soft delete (corbeille) — for all waybills/submissions
-    $button .= '<button type="button" class="btn btn-sm btn-warning btn-soft-delete-waybill" title="Supprimer" style="min-width: 2rem; padding: 8px 6px; margin-left: 3px;" data-waybill-id="' . $row->id . '"><i class="fa fa-trash"></i></button>';
+    $button .= '<button type="button" class="btn btn-sm btn-warning btn-soft-delete-waybill" title="Supprimer" style="min-width: 2rem; margin-left: 3px;" data-waybill-id="' . $row->id . '"><i class="fa fa-trash"></i></button>';
 
-    $button .= '<a class="btn btn-sm btn-primary wabill-pageview"  target="_blank" href="' . url('admin/waybill/' . $row->id) . '"><i class="fas fa-eye"></i> Voir Waybill</a>';
+    $button .= '<a class="btn btn-sm btn-primary wabill-pageview"  target="_blank" title="Voir waybill" href="' . url('admin/waybill/' . $row->id) . '" style="margin-left: 3px;"><i class="fas fa-file-alt"></i></a>';
 
+    $button .= '<button type="button" class="btn btn-sm btn-secondary btn-view-box-waybill" title="voir l`étiquette" style="min-width: 2rem; margin-left: 3px;" data-waybill-id="' . $row->id . '"><i class="fa fa-print"></i></button>';
 
             if ($row->type == 1) {
 
-                $button .= '<a class="btn btn-sm btn-danger btn-admin-delete-submission" title="Supprimer" style="width: 2rem; padding: 8px 0; margin-right: 3px; margin-left: 3px;" data-waybill-id="' . $row->id . '"><i class="fa fa-trash"></i></a>';
+                $button .= '<a class="btn btn-sm btn-danger btn-admin-delete-submission" title="Supprimer" style="width: 2rem; padding: 8px 0; margin-left: 3px;" data-waybill-id="' . $row->id . '"><i class="fa fa-trash"></i></a>';
                 // $button .= '<a class="btn btn-sm btn-primary prix" data-id="' . $row->id . '" style="background-color:#FFD700; color: black;" ><i class="fas fa-dollar-sign"></i> prix</a>';
 
             }
