@@ -469,7 +469,8 @@
 
 
             if(waybillType && (waybillType === "false" || waybillType === "true")){
-                // Client DataTable
+                // Client DataTable — only when client table exists (non-admin role)
+                if ($('#client_table_id').length) {
                 $('#client_table_id').DataTable({
                     processing   : true,
                     serverSide   : true,
@@ -520,6 +521,7 @@
                     },
                     buttons: ["copy", "csv", "excel", "pdf", "print", "colvis"]
                 });
+                }
 
                 $(document).on('click', '.prix', function (e) {
                     e.preventDefault();
@@ -571,8 +573,10 @@
                 });
 
 
-                // Admin dataTable
-                var table = $('#admin_table_id').DataTable({
+                // Admin dataTable — only when admin table exists (admin role)
+                var table;
+                if ($('#admin_table_id').length) {
+                table = $('#admin_table_id').DataTable({
                     processing   : true,
                     serverSide   : true,
                     responsive   : true,
@@ -593,7 +597,7 @@
 
                             d.client_id = $('#client_id').val();
 
-                            d.waybill_number = $('#waybill_number').val();
+                            d.waybill_number = ($('#waybill-search-input').val() || '').trim();
 
                         }
 
@@ -871,9 +875,25 @@ function updateApprovalStatus1(waybillId, status) {
                     table.draw();
                 });
 
-                $('#waybill_number').change(function () {
+                // Apply filters when "Rechercher" is clicked (sends slip search + date + client to server)
+                $('#waybill-search-btn').on('click', function () {
                     table.draw();
                 });
+                $('#waybill-search-input').on('keypress', function (e) {
+                    if (e.which === 13) {
+                        e.preventDefault();
+                        table.draw();
+                    }
+                });
+
+                // Reset: clear all filters and reload table
+                $('#waybill-reset-btn').on('click', function () {
+                    $('#date_filter').val('').prop('selectedIndex', 0);
+                    $('#client_id').val('').prop('selectedIndex', 0);
+                    $('#waybill-search-input').val('');
+                    table.ajax.reload();
+                });
+                } // end if admin_table_id exists
 
 
                 $('body').on('click', '.btn-approve', function () {
@@ -1139,7 +1159,7 @@ function updateApprovalStatus1(waybillId, status) {
                         "data": function (d) {
                             d.date_type = $('#date_filter').val();
                             d.client_id = $('#client_id').val();
-                            d.waybill_number = $('#waybill_number').val();
+                            d.waybill_number = ($('#waybill-search-input').val() || '').trim();
                         }
                     },
                     "columns" : [
@@ -1188,8 +1208,21 @@ function updateApprovalStatus1(waybillId, status) {
                     archivedSubmissionAdmin.draw();
                 });
 
-                $('#waybill_number').change(function () {
+                $('#waybill-search-btn').on('click', function () {
                     archivedSubmissionAdmin.draw();
+                });
+                $('#waybill-search-input').on('keypress', function (e) {
+                    if (e.which === 13) {
+                        e.preventDefault();
+                        archivedSubmissionAdmin.draw();
+                    }
+                });
+
+                $('#waybill-reset-btn').on('click', function () {
+                    $('#date_filter').val('').prop('selectedIndex', 0);
+                    $('#client_id').val('').prop('selectedIndex', 0);
+                    $('#waybill-search-input').val('');
+                    archivedSubmissionAdmin.ajax.reload();
                 });
             }
 
@@ -1202,6 +1235,8 @@ function updateApprovalStatus1(waybillId, status) {
 
     <script>
 (function () {
+    // Run after DOM ready so admin DataTable is already initialized (avoids 2–3s timing issue)
+    $(document).ready(function () {
     // Blade-rendered endpoints / token
     var datatablesUrl = "{{ url('admin/waybills/datatables') }}";           // server-side DataTables URL
     var searchUrl = "{{ route('admin.waybills.search-by-id') }}";         // POST endpoint that returns JSON waybills[]
@@ -1215,7 +1250,7 @@ function updateApprovalStatus1(waybillId, status) {
         return;
     }
 
-    // get DataTable instance if already initialized
+    // get DataTable instance (now available because we run after document.ready)
     var dt = null;
     try { if ($.fn.dataTable.isDataTable($admin)) dt = $admin.DataTable(); } catch(e) { dt = null; }
 
@@ -1289,35 +1324,19 @@ function updateApprovalStatus1(waybillId, status) {
         var raw = $('#waybill-search-input').val().trim();
         if (!raw) { $('#waybill-search-input').focus(); return; }
 
-        var $btn = $(this);
-        $btn.prop('disabled', true).text('Recherche...');
-
-        // If admin table exists and is serverSide, prefer server-side search (keeps counts/pagination)
+        // Resolve dt at click time (in case init order changed)
+        var dtNow = $.fn.dataTable.isDataTable($admin) ? $admin.DataTable() : null;
         var isServerSide = false;
-        if (dt && dt.settings && dt.settings()[0] && dt.settings()[0].oInit) {
-            isServerSide = !!dt.settings()[0].oInit.serverSide;
+        if (dtNow && dtNow.settings && dtNow.settings()[0] && dtNow.settings()[0].oInit) {
+            isServerSide = !!dtNow.settings()[0].oInit.serverSide;
         }
-
+        // Server-side: document.ready handler already does table.draw() with waybill_number in data — do nothing here to avoid double request / wrong URL
         if (isServerSide) {
-            // server-side: instruct DataTable to request filtered data from the server
-            // pass `search_id` as query param; server must handle it in adminDataTable
-            var rawEncoded = encodeURIComponent(raw);
-            var sep = datatablesUrl.indexOf('?') === -1 ? '?' : '&';
-            var newUrl = datatablesUrl + sep + 'search_id=' + rawEncoded;
-            if (waybillTypeParam) newUrl += '&waybill-type=' + encodeURIComponent(waybillTypeParam);
-
-            // use DataTables API to set URL + reload
-            try {
-                dt.ajax.url(newUrl).load(function () {
-                    $btn.prop('disabled', false).text('Rechercher');
-                }, true);
-            } catch (e) {
-                console.error('Failed to reload DataTable via ajax.url().load():', e);
-                $btn.prop('disabled', false).text('Rechercher');
-                alert('Échec de la recherche (voir console).');
-            }
             return;
         }
+
+        var $btn = $(this);
+        $btn.prop('disabled', true).text('Recherche...');
 
         // else: client-side table or no DataTable — do POST to search endpoint and insert rows
         $.ajax({
@@ -1492,7 +1511,7 @@ $('#waybill-reset-btn').on('click', function () {
     }
 });
 
-
+    }); // end document.ready (IIFE runs after main inits to avoid 2–3s timing issue)
 })();
 </script>
 

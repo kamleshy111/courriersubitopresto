@@ -295,18 +295,32 @@ class WaybillController extends Controller
                 ->where('type', $type)
                 ->withoutTrashed();
 
+            // Filter by date type (1 = today, 2 = this week)
+            if ($request->filled('date_type')) {
+                if ($request->date_type == 1) {
+                    $waybills->whereDate('date', Carbon::today());
+                }
+                if ($request->date_type == 2) {
+                    $waybills->whereBetween('date', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()]);
+                }
+            }
 
-            // ->get();
-
-            /*if($request->client_id)
-
-            {
-
+            // Filter by client (recipient)
+            if ($request->filled('client_id')) {
                 $waybills->where('recipient_id', $request->client_id);
+            }
 
-            }*/
-
-
+            // Filter by slip number (formatted: prefix + padded soft_id, from user->client)
+            $waybillNumber = trim((string) $request->waybill_number);
+            if ($waybillNumber !== '') {
+                $waybills->whereExists(function ($q) use ($waybillNumber) {
+                    $q->select(\DB::raw(1))
+                        ->from('users')
+                        ->join('clients', 'users.client_id', '=', 'clients.id')
+                        ->whereColumn('users.id', 'waybills.user_id')
+                        ->whereRaw("CONCAT(clients.prefix, LPAD(waybills.soft_id, 6, '0')) LIKE ?", ['%' . $waybillNumber . '%']);
+                });
+            }
 
     // Process data for DataTables
 
@@ -552,9 +566,17 @@ class WaybillController extends Controller
 
             }
 
-
-
-
+            // Filter by slip number (formatted: prefix + padded soft_id)
+            $waybillNumber = trim((string) $request->waybill_number);
+            if ($waybillNumber !== '') {
+                $waybills->whereExists(function ($q) use ($waybillNumber) {
+                    $q->select(\DB::raw(1))
+                        ->from('users')
+                        ->join('clients', 'users.client_id', '=', 'clients.id')
+                        ->whereColumn('users.id', 'waybills.user_id')
+                        ->whereRaw("CONCAT(clients.prefix, LPAD(waybills.soft_id, 6, '0')) LIKE ?", ['%' . $waybillNumber . '%']);
+                });
+            }
 
             return datatables( $waybills)
 
