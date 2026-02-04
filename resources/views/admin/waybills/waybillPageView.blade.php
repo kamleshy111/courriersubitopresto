@@ -22,7 +22,7 @@
 
 @section('content')
 
-<div class="container mb-3">
+{{-- <div class="container mb-3">
     <div class="card">
         <div class="card-header">
             <h5 class="mb-0">Aperçu du bordereau (nouveau)</h5>
@@ -31,7 +31,7 @@
             <iframe src="{{ url('admin/waybill/' . $waybill->id . '/label-preview') }}" title="Label preview" style="width: 100%; min-height: 680px; border: 1px solid #ddd; border-radius: 4px;"></iframe>
         </div>
     </div>
-</div>
+</div> --}}
 
 <div class="container">
 
@@ -128,13 +128,13 @@
                         <tr>
 
                             <td colspan="2">
-            
+
                                 <p><b>Heures d’ouverture + Informations permanentes</b></p>
-            
+
                                 <p style="font-size:6mm;">{{$waybill->shipper_note??'N/D'}} </p>
-            
+
                             </td>
-            
+
                         </tr>
 
                         {{--<tr>
@@ -266,13 +266,13 @@
                         <tr>
 
                             <td colspan="2">
-            
+
                                 <p><b>Heures d’ouverture + Informations permanentes</b></p>
-            
+
                                 <p style="font-size:6mm;">{{$waybill->recipient_note??'N/D'}} </p>
-            
+
                             </td>
-            
+
                         </tr>
 
                         {{--<tr>
@@ -280,11 +280,11 @@
                             <td colspan="2"><p>&nbsp;</p><p>&nbsp;</p></td>
 
                         </tr>--}}
-                        
 
-                            
-            
-                        
+
+
+
+
 
                         <tr>
 
@@ -485,11 +485,11 @@
 
                                                 @endrole
                                                  --}}
-                                                
+
                                                  {{--@auth
                                                     @if(!auth()->user()->roles->contains('id', 3))
                                                         {{  number_format(floatval($formattedPrice), 2) }} $
-                                                        
+
                                                      @else--}}
                                                      {{-- {{ $formattedPrice }} $ --}}
                                                      {{-- {{ number_format(0.00, 2) }} $ --}}
@@ -503,11 +503,11 @@
                                             {{--@role('admin'||'Driver')--}}
 
                                                 <td style="border: 0.5mm solid black;" width="25%">
-                                                
+
                                                 @auth
                                                     @if(!auth()->user()->roles->contains('id', 3))
                                                         {{  number_format(floatval($formattedPrice), 2) }} $
-                                                        
+
                                                      @else
                                                      {{-- {{ $formattedPrice }} $ --}}
                                                      {{-- {{ number_format(0.00, 2) }} $ --}}
@@ -577,20 +577,20 @@
                                         data-id="{{$waybill->id}}" data-table= "waybills" data-column="round_trip_1"
 
                                         ondblclick="updateWaybillCell(this, 'waybills', {{$waybill->id}}, 'round_trip_1')">{{ $waybill->round_trip_1 == 1 ? 'X' : ''}}</td>
-                                        
+
                                         <td style="border: 0.5mm solid black;" class="editable"
 
                                         data-id="{{$waybill->id}}" data-table= "waybills" data-column="waiting_time_2"
 
                                         ondblclick="updateWaybillCell(this, 'waybills', {{$waybill->id}}, 'waiting_time_2')">{{$waybill->waiting_time_2 }}</td>
-                                        
+
                                         {{--<td style="border: 0.5mm solid black;">{{$waybill->waiting_time_2}}</td>
-                                        
+
                                         <td style="border: 0.5mm solid black;" class="editable"
 
                                         data-id="{{$waybill->id}}" data-table= "waybills" data-column="waiting_time_1"
 
-                                        ondblclick="updateWaybillCell(this, 'waybills', {{$waybill->id}}, 'round_trip_1')">{{ $waybill->round_trip_1 == 1 ? 'X' : '' }}</td> 
+                                        ondblclick="updateWaybillCell(this, 'waybills', {{$waybill->id}}, 'round_trip_1')">{{ $waybill->round_trip_1 == 1 ? 'X' : '' }}</td>
                                         <td style="border: 0.5mm solid black;" class="editable"
 
                                         data-id="{{$waybill->id}}" data-table= "waybills" data-column="waiting_time_1"
@@ -598,7 +598,7 @@
                                         ondblclick="updateWaybillCell(this, 'waybills', {{$waybill->id}}, 'waiting_time_1')">{{$waybill->waiting_time_1}}</td>
                                         <td style="border: 0.5mm solid black;"> {{ $round_trip_1 == 1 ? 'X' : '' }} </td>
                                         <td style="border: 0.5mm solid black;">{{$waybill->waiting_time_2}}</td>--}}
-                                        
+
                                     </tr>
 
                                     {{-- <tr>
@@ -614,12 +614,12 @@
                                         <td style="border: 0.5mm solid black;">{{$waybill->round_trip_2}}</td>
 
                                     </tr> --}}
-                                    
+
                                     <tr>
 
                                         <td style="border: 0.5mm solid black;">Temps d’attente</td>
 
-                                        <td style="border: 0.5mm solid black;" 
+                                        <td style="border: 0.5mm solid black;"
 
                                         data-id="{{$waybill->id}}" data-table= "waybills" data-column="round_trip_1"
 
@@ -638,7 +638,7 @@
                                                 <td style="border: 0.5mm solid black;">{{$waybill->truck_2}}</td>
 
                                     </tr>
-                                    
+
                                     <tr>
 
                                         <td style="border: 0.5mm solid black;">Tailgate</td>
@@ -658,7 +658,7 @@
                                             @auth
                                                     @if(!auth()->user()->roles->contains('id', 3))
                                                         {{  number_format(floatval($formattedPrice), 2) }} $
-                                                        
+
                                                      @else
                                                      {{-- {{ $formattedPrice }} $ --}}
                                                      {{-- {{ number_format(0.00, 2) }} $ --}}
@@ -873,7 +873,7 @@
 
         flex-direction: column;
 
-        justify-content: space-between; 
+        justify-content: space-between;
 
         min-width: 45%;
 
@@ -883,12 +883,12 @@
 
         border-radius: 10px;
 
-        
+
 
         box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
 
     }*/
-    
+
     .waybill-table {
     background-color: {{
         (auth()->check() && auth()->user()->roles->contains('id', 2))

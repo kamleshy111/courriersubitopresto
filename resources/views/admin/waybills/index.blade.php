@@ -250,6 +250,25 @@
         </div>
         @endif
     @endrole
+
+    <div class="modal fade" id="viewBoxModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Waybill aperçu</h5>
+                </div>
+                <div class="modal-body">
+                    <label for="modal_label_count">Nombre d'étiquettes :</label>
+                    <input type="number" class="form-control" id="modal_label_count" placeholder="Entrez le nombre d'étiquettes (1-100)" min="1" max="100" required>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" onclick="submitForm()">
+                        Confirmer
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 @stop
 @push('js')
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>
@@ -257,6 +276,7 @@
     <script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10.15.7/dist/sweetalert2.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10.15.7/dist/sweetalert2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
 /*(function () {
@@ -637,7 +657,7 @@
                             "data" : "date"
 
                         },
-                        
+
                         { data: 'created_at'},
 
 
@@ -1077,7 +1097,16 @@ function updateApprovalStatus1(waybillId, status) {
                     });
                 });
 
-                // Soft delete (corbeille) — moves waybill to trash, does not remove from DB
+                $('body').on('click', '.btn-view-box-waybill', function () {
+                    currentWaybillId = $(this).data('waybill-id');
+                    const modalEl = document.getElementById('viewBoxModal');
+
+                    // waybill ID to modal
+                    modalEl.dataset.waybillId = currentWaybillId;
+                    const modal = new bootstrap.Modal(modalEl);
+                    modal.show();
+                });
+
                 $('body').on('click', '.btn-soft-delete-waybill', function () {
                     var waybillId = $(this).data('waybill-id');
                     Swal.fire({
@@ -1228,6 +1257,30 @@ function updateApprovalStatus1(waybillId, status) {
 
         });
 
+        function submitForm() {
+            const labelCount = document.getElementById('modal_label_count').value;
+            const modalEl = document.getElementById('viewBoxModal');
+
+            const waybillId = modalEl.dataset.waybillId;
+
+            if (!waybillId) {
+                alert('Waybill ID manquant');
+                return;
+            }
+
+            if (!labelCount || labelCount < 1 || labelCount > 100) {
+                alert('Veuillez entrer un nombre valide (1–100)');
+                return;
+            }
+
+            const baseUrl = "{{ route('admin.waybill.label-preview', ['id' => '__ID__']) }}";
+
+            const finalUrl =
+                baseUrl.replace('__ID__', waybillId) +
+                '?label_count=' + labelCount;
+
+            window.location.href = finalUrl;
+        }
 
 
 
@@ -1294,6 +1347,7 @@ function updateApprovalStatus1(waybillId, status) {
         html += '<button class="btn btn-sm btn-danger reject-waybill" data-status="0" data-id="' + wb.id + '" style="margin-left:5px;"><i class="fa fa-times"></i></button> ';
         html += '<button type="button" class="btn btn-sm btn-warning btn-soft-delete-waybill" title="Supprimer" style="min-width:2rem;padding:8px 6px;margin-left:3px;" data-waybill-id="' + wb.id + '"><i class="fa fa-trash"></i></button> ';
         html += '<a class="btn btn-sm btn-primary" target="_blank" href="/admin/waybill/' + wb.id + '"><i class="fas fa-eye"></i> Voir Waybill</a> ';
+        html += '<button class="btn btn-sm btn-info btn-view-box-waybill" title="Voir la boîte" style="width:2rem;padding:8px 0;margin:0 3px;" data-waybill-id="' + wb.id + '"><i class="fa fa-box"></i></button> ';
         if (wb.type == 1) html += '<a class="btn btn-sm btn-danger btn-admin-delete-submission" data-waybill-id="' + wb.id + '" style="width:2rem;padding:8px 0;margin:0 3px;"><i class="fa fa-trash"></i></a>';
         html += '</div></div>';
         return html;
