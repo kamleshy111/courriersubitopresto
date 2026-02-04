@@ -2,13 +2,13 @@
     @php
         if ($status == 'tomorrow') {
         $color = '#8fdefb';
-        } 
+        }
         elseif ($status == 'same_day') {
             $color = '#a6f4ee';
-        } 
+        }
         elseif ($status == 'urgent') {
             $color = '#FEFBC0';
-        } 
+        }
         elseif ($status == 'code_red') {
             $color = '#E8A7BF';
         }
@@ -17,18 +17,18 @@
         }
         elseif ($status == 'night') {
             $color = '#E8A7BF';
-        }  
+        }
         else {
             $color = '';
         }
-        
+
     @endphp
-    
+
     @role('admin')
-    
+
     {{-- remove color from admin
     <div style="opacity: 45%; background-color: {{ $color }}"> --}}
-    <div> 
+    <div>
     @else
     <div>
     @endrole
@@ -73,16 +73,16 @@
                         </tr>
                         <tr>
                         <td colspan="2">
-            
+
                                 <p><b>Heures d’ouverture + Informations permanentes</b></p>
-            
+
                                 <p style="font-size:14px;" >{{$shipper_note??$shipper_note??'N/D'}}</p>
-            
+
                             </td>
                          </tr>
                           {{--<tr>
                             <td>&nbsp;</td>
-                        </tr>--}}   
+                        </tr>--}}
                         {{--<tr>
                             <td colspan="2"><p>&nbsp;</p><p>&nbsp;</p></td>
                         </tr>--}}
@@ -125,11 +125,11 @@
                         </tr>
                         <tr>
                         <td colspan="2">
-            
+
                                 <p><b>Heures d’ouverture + Informations permanentes</b></p>
-            
+
                                 <p style="font-size:14px;">{{$recipient_note??$recipient_note??'N/D'}} </p>
-            
+
                             </td>
                         </tr>
                          {{--<tr>
@@ -159,29 +159,29 @@
                 @php
                     /*if ($status == 'tomorrow') {
                     $color = '#8fdefb';
-                    } 
+                    }
                     elseif ($status == 'same_day') {
                         $color = '#a6f4ee';
-                    } 
+                    }
                     elseif ($status == 'urgent') {
                         $color = '#FDFD96';
-                    } 
+                    }
                     elseif ($status == 'code_red') {
                         $color = '#e3342f';
-                    } 
+                    }
                     else {
                         $color = '';
                     }*/
 
                     if ($status == 'tomorrow') {
         $color = '#8fdefb';
-        } 
+        }
         elseif ($status == 'same_day') {
             $color = '#a6f4ee';
-        } 
+        }
         elseif ($status == 'urgent') {
             $color = '#FEFBC0';
-        } 
+        }
         elseif ($status == 'code_red') {
             $color = '#E8A7BF';
         }
@@ -190,11 +190,11 @@
         }
         elseif ($status == 'night') {
             $color = '#E8A7BF';
-        }  
+        }
         else {
             $color = '';
         }
-                    
+
                 @endphp
                 @role('admin')
                 {{-- it's color to admin view <div style="opacity: 45%; background-color: {{ $color }}"> --}}
@@ -240,7 +240,7 @@
 {{--                                                    $setting = \App\Models\Setting::where('user_id', $user_id)->first();--}}
 {{--                                                @endphp--}}
                                                 <td style="border: 0.5mm solid black;" width="25%">
-                                                    @if(request()->boolean('archive') && $price != null)
+                                                    @if($price != null)
     {{ $price }}
 @endif
 
@@ -293,7 +293,7 @@
                                                 <td style="border: 0.5mm solid black;">{{$truck_1}}</td>
                                                 <td style="border: 0.5mm solid black;">{{$truck_2}}</td>
                                             </tr>
-                                            
+
                                             <tr>
                                                 <td style="border: 0.5mm solid black;">Tailgate</td>
                                                 <td style="border: 0.5mm solid black;">{{$tailgate_1 ?? " "}}</td>
