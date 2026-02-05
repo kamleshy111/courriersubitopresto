@@ -206,7 +206,7 @@
                                 {{--<th style="width: 13%; text-align: center!important;">Statut</th>--}}
                                 <th style="width: 13%; text-align: center!important;">Statut de livraison</th>
                                 <th style="width: 13%; text-align: center!important;">Date</th>
-                                <th style="width: 13%; text-align: center!important;">Date de création</th>
+                                <th style="width: 13%; text-align: center!important;">Date de modification</th>
                                 @if(Request::query('waybill') == "false" || Request::query('archive') == "true")
                                     <th>Prix</th>
                                 @endif
@@ -638,7 +638,7 @@
 
                         },
                         
-                        { data: 'created_at'},
+                        { data: 'updated_at'},
 
 
                             @if(Request::query('waybill') == "false")
@@ -779,18 +779,19 @@ $(document).on('click', '.approve-waybill, .reject-waybill', function (e) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            // ✅ Update UI
-            /*if (status === 1) {
-                button.removeClass('btn-danger').addClass('btn-success').text('Approved');
-            } else {
-                button.removeClass('btn-success').addClass('btn-danger').text('Rejected');
-            }*/
-             if (status === 1) {
-                // Update UI for approve
+            // ✅ Update UI colors for current row
+            if (status === 1) {
                 $('[data-id="'+waybillId+'"]').removeClass('btn-danger').addClass('btn-success');
             } else {
-                // Update UI for reject
                 $('[data-id="'+waybillId+'"]').removeClass('btn-success').addClass('btn-danger');
+            }
+
+            // ✅ Refresh DataTables so list reflects latest status/order
+            if ($.fn.DataTable.isDataTable('#admin_table_id')) {
+                $('#admin_table_id').DataTable().ajax.reload(null, false); // keep current page
+            }
+            if ($.fn.DataTable.isDataTable('#client_table_id')) {
+                $('#client_table_id').DataTable().ajax.reload(null, false);
             }
 
             Swal.fire({
@@ -1310,7 +1311,7 @@ function updateApprovalStatus1(waybillId, status) {
                 },
                 delivery_status: renderDeliveryStatus(wb.delivery_status), // HTML or ''
                 date: wb.date || '',
-                created_at: wb.created_at || '',
+                updated_at: wb.updated_at || '',
                 price: (typeof wb.price !== 'undefined') ? wb.price : '',
                 action: buildActionHtml(wb),
                 id: wb.id,
@@ -1378,7 +1379,7 @@ function updateApprovalStatus1(waybillId, status) {
                     html += '<td>' + (o.recipient.address || '') + '</td>';
                     html += '<td>' + (o.delivery_status || '') + '</td>';
                     html += '<td>' + (o.date || '') + '</td>';
-                    html += '<td>' + (o.created_at || '') + '</td>';
+                    html += '<td>' + (o.updated_at || '') + '</td>';
                     if (o.price !== '') html += '<td>' + o.price + '</td>';
                     html += '<td>' + (o.action || '') + '</td>';
                     html += '</tr>';

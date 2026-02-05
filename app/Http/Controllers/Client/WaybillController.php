@@ -325,7 +325,12 @@ class WaybillController extends Controller
     // Process data for DataTables
 
     return datatables($waybills)
-
+        ->orderColumn('soft_id', 'waybills.soft_id $1')
+        ->orderColumn('recipient.name', 'clients.name $1')
+        ->orderColumn('recipient.address', 'clients.address $1')
+        ->orderColumn('delivery_status', 'waybills.delivery_status $1')
+        ->orderColumn('date', 'waybills.date $1')
+        ->orderColumn('updated_at', 'waybills.updated_at $1')
         ->editColumn('date', function ($row) {
 
             // Format the date column
@@ -333,11 +338,16 @@ class WaybillController extends Controller
             return $row->date ? Carbon::parse($row->date)->toFormattedDateString() : null;
 
         })
-        ->editColumn('created_at', function ($row) {
+        // ->editColumn('created_at', function ($row) {
 
-            // Same format as "date" column (e.g. Jan 22, 2026)
+        //     // Same format as "date" column (e.g. Jan 22, 2026)
 
-            return $row->created_at ? Carbon::parse($row->created_at)->toFormattedDateString() : null;
+        //     return $row->created_at ? Carbon::parse($row->created_at)->toFormattedDateString() : null;
+
+        // })
+        ->editColumn('updated_at', function ($row) {
+
+            return $row->updated_at ? Carbon::parse($row->updated_at)->toFormattedDateString() : null;
 
         })
         ->editColumn('delivery_status', function ($row) {
@@ -487,8 +497,9 @@ class WaybillController extends Controller
     $button .= '</button>';
 
     // Soft delete (corbeille) — for all waybills/submissions
-    $button .= '<button type="button" class="btn btn-sm btn-warning btn-soft-delete-waybill" title="Supprimer" style="min-width: 2rem; padding: 8px 6px; margin-left: 3px;" data-waybill-id="' . $row->id . '"><i class="fa fa-trash"></i></button>';
-
+    if ($row->type != 1) {
+        $button .= '<button type="button" class="btn btn-sm btn-warning btn-soft-delete-waybill" title="Supprimer" style="min-width: 2rem; padding: 8px 6px; margin-left: 3px;" data-waybill-id="' . $row->id . '"><i class="fa fa-trash"></i></button>';
+    }
     $button .= '<a class="btn btn-sm btn-primary wabill-pageview"  target="_blank" href="' . url('admin/waybill/' . $row->id) . '"><i class="fas fa-eye"></i> Voir Waybill</a>';
 
 

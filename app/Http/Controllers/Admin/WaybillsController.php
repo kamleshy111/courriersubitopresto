@@ -2398,7 +2398,7 @@ public function adminByWaybillID(Request $request)
 
         // Build query
         $query = \App\Models\Waybill::with(['recipient', 'shipper', 'user.client'])
-            ->orderBy('date', 'desc');
+            ->orderBy('updated_at', 'desc');
 
         // If a numeric soft_id exists, filter by it
         if (!is_null($soft_id)) {
@@ -2466,7 +2466,7 @@ public function adminByWaybillID(Request $request)
                 'shipper_name' => $wb->shipper->name ?? 'N/A',
                 'shipper_address' => $wb->shipper->address ?? 'N/A',
                 'date' => $wb->date ? \Carbon\Carbon::parse($wb->date)->toFormattedDateString() : null,
-                'created_at' => $wb->created_at ? \Carbon\Carbon::parse($wb->created_at)->toFormattedDateString() : null,
+                'updated_at' => $wb->updated_at ? \Carbon\Carbon::parse($wb->updated_at)->toFormattedDateString() : null,
                 'delivery_status' => $wb->delivery_status,
                 'type' => $wb->type,
             ];
