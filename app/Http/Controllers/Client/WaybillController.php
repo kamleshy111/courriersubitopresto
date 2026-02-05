@@ -485,17 +485,17 @@ class WaybillController extends Controller
     $button .= '<i class="fa fa-times"></i>'; // Cross icon
 
     $button .= '</button>';
-
-    // Soft delete (corbeille) — for all waybills/submissions
-    $button .= '<button type="button" class="btn btn-sm btn-warning btn-soft-delete-waybill" title="Supprimer" style="min-width: 2rem; margin-left: 3px;" data-waybill-id="' . $row->id . '"><i class="fa fa-trash"></i></button>';
-
+    if ($row->type != 1) {
+        // Soft delete (corbeille) — for all waybills/submissions
+        $button .= '<button type="button" class="btn btn-sm btn-warning btn-soft-delete-waybill" title="Supprimer" style="min-width: 2rem; margin-left: 3px;" data-waybill-id="' . $row->id . '"><i class="fa fa-trash"></i></button>';
+    }
     $button .= '<a class="btn btn-sm btn-primary wabill-pageview"  target="_blank" title="Voir waybill" href="' . url('admin/waybill/' . $row->id) . '" style="margin-left: 3px;"><i class="fas fa-file-alt"></i></a>';
 
     $button .= '<button type="button" class="btn btn-sm btn-secondary btn-view-box-waybill" title="voir l`étiquette" style="min-width: 2rem; margin-left: 3px;" data-waybill-id="' . $row->id . '"><i class="fa fa-print"></i></button>';
 
             if ($row->type == 1) {
 
-                $button .= '<a class="btn btn-sm btn-danger btn-admin-delete-submission" title="Supprimer" style="width: 2rem; padding: 8px 0; margin-left: 3px;" data-waybill-id="' . $row->id . '"><i class="fa fa-trash"></i></a>';
+                $button .= '<a class="btn btn-sm btn-danger btn-admin-delete-submission" title="Supprimer" style="width: 2rem; margin-left: 3px;" data-waybill-id="' . $row->id . '"><i class="fa fa-trash"></i></a>';
                 // $button .= '<a class="btn btn-sm btn-primary prix" data-id="' . $row->id . '" style="background-color:#FFD700; color: black;" ><i class="fas fa-dollar-sign"></i> prix</a>';
 
             }
