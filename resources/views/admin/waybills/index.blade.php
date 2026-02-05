@@ -497,9 +497,9 @@
                             "data" : "recipient.address",
                             "defaultContent": "N/A"
                         },
-                        {
-                            "data" : "status"
-                        },
+                        // {
+                        //     "data" : "status"
+                        // },
                         {
                             "data" : "delivery_status"
                         },
@@ -633,15 +633,15 @@
                             "data" : "date"
 
                         },
-                        
+
                         { data: 'created_at'},
 
 
-                            @if(Request::query('waybill') == "false")
+                        @if(Request::query('waybill') == "false")
 
-                        { data: 'price' },
+                            { data: 'price' },
 
-                            @endif
+                        @endif
 
                         {
 
@@ -1111,7 +1111,7 @@ function updateApprovalStatus1(waybillId, status) {
                         {"data" : "soft_id", searchable: true},
                         {"data" : "recipient.name", "defaultContent": "N/A"},
                         {"data" : "recipient.address", "defaultContent": "N/A"},
-                        {"data" : "status"},
+                        // {"data" : "status"},
                         {"data" : "delivery_status"},
                         {"data" : "date"},
                         { data: 'price' },
@@ -1165,6 +1165,9 @@ function updateApprovalStatus1(waybillId, status) {
                         {
                             // "data" : "date"
                             "data" : "submission_approval_date"
+                        },
+                        {
+                            "data" : "created_at"
                         },
                         { data: 'price' },
 
