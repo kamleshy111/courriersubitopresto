@@ -593,6 +593,18 @@ class WaybillController extends Controller
 
                 })
 
+                ->editColumn('created_at', function($row)
+
+                {
+
+                    if($row->created_at != null){
+
+                        return Carbon::parse($row->created_at)->toFormattedDateString();
+
+                    }
+
+                })
+
                 ->editColumn('delivery_status', function($row)
 
                 {
