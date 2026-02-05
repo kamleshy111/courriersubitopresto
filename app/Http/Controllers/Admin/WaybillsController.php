@@ -1637,10 +1637,38 @@ public function uploadPickupImageUpdated(Request $request, $waybillId)
         'is_mira' => 'nullable|string',
     ]);*/
 
-    $request->validate([
-    'pickup_image' => 'required|file|image|mimes:jpeg,png,jpg,gif|max:10240', // 10MB max, adjust as needed
-    'is_mira' => 'nullable|string',
-    ]);
+    // Allow single file, multiple files (pickup_image[]), or base64 string
+    $hasFiles = $request->hasFile('pickup_image');
+    $files = $hasFiles ? $request->file('pickup_image') : null;
+    if ($files && !is_array($files)) {
+        $files = [$files];
+    }
+    if ($files && count($files) > 5) {
+        return response()->json(['success' => false, 'message' => 'Maximum 5 images allowed.']);
+    }
+    if (!$hasFiles && !$request->has('pickup_image')) {
+        return response()->json(['success' => false, 'message' => 'No image provided.']);
+    }
+    if ($files) {
+        // Single file (camera/one file) vs multiple (pickup_image[])
+        if (is_array($request->file('pickup_image'))) {
+            $request->validate([
+                'pickup_image' => 'array',
+                'pickup_image.*' => 'image|mimes:jpeg,png,jpg,gif|max:10240',
+                'is_mira' => 'nullable|string',
+            ]);
+        } else {
+            $request->validate([
+                'pickup_image' => 'required|file|image|mimes:jpeg,png,jpg,gif|max:10240',
+                'is_mira' => 'nullable|string',
+            ]);
+        }
+    } else {
+        $request->validate([
+            'pickup_image' => 'required|string',
+            'is_mira' => 'nullable|string',
+        ]);
+    }
 
     $is_mira = $request->input('is_mira');
     $loggedUserId = Auth::id();
@@ -1687,37 +1715,45 @@ public function uploadPickupImageUpdated(Request $request, $waybillId)
 
     try {
         $path = null;
+        $paths = [];
 
-        // ✅ If base64 image provided
-        if ($request->has('pickup_image') && is_string($request->pickup_image)) {
+        // ✅ Multiple files (pickup_image[])
+        if ($files && count($files) > 0) {
+            foreach ($files as $file) {
+                if ($file->isValid()) {
+                    $paths[] = $file->store('pickup_images', 'public');
+                }
+            }
+            if (empty($paths)) {
+                return response()->json(['success' => false, 'message' => 'No valid image(s) provided.']);
+            }
+        }
+        // ✅ Single base64 image
+        elseif ($request->has('pickup_image') && is_string($request->pickup_image)) {
             $imageData = $request->pickup_image;
-
-            // Clean and decode base64
             $imageData = preg_replace('/^data:image\/\w+;base64,/', '', $imageData);
             $imageData = str_replace(' ', '+', $imageData);
             $image = base64_decode($imageData);
-
             if (!$image) {
                 return response()->json(['success' => false, 'message' => 'Invalid base64 image.']);
             }
-
             $imageName = 'pickup_image_' . time() . '.jpg';
             $path = 'pickup_images/' . $imageName;
             Storage::disk('public')->put($path, $image);
         }
-
-        // ✅ If file uploaded
+        // ✅ Single file (backward compat)
         elseif ($request->hasFile('pickup_image') && $request->file('pickup_image')->isValid()) {
             $file = $request->file('pickup_image');
             $path = $file->store('pickup_images', 'public');
-        }
-
-        else {
+        } else {
             return response()->json(['success' => false, 'message' => 'No image provided.']);
         }
+
+        $pickupImageValue = count($paths) > 0 ? json_encode($paths) : $path;
+
         if($is_mira == "1" ){
             Waybill::where('id', $waybillId)->update([
-                'pickup_image' => $path,
+                'pickup_image' => $pickupImageValue,
                 // 'pickuptime' => Carbon::now(), // Store the current timestamp
                 'driver_assign_time' => now(),
                 'drop_time' => now(), // Store the current timestamp
@@ -1730,7 +1766,7 @@ public function uploadPickupImageUpdated(Request $request, $waybillId)
         }
         else{
              Waybill::where('id', $waybillId)->update([
-            'pickup_image' => $path,
+            'pickup_image' => $pickupImageValue,
             'pickup_time' => now(),
             'dashboard_position' => $waybillPosition,
             'delivery_status' => 2,
@@ -1746,7 +1782,8 @@ public function uploadPickupImageUpdated(Request $request, $waybillId)
             'driver_flag' => 2
         ]);*/
 
-        return response()->json(['success' => true, 'path' => $path]);
+        $count = count($paths) > 0 ? count($paths) : ($path ? 1 : 0);
+        return response()->json(['success' => true, 'path' => count($paths) ? $paths[0] : $path, 'count' => $count]);
 
     } catch (\Exception $e) {
         Log::error('Pickup image upload error', [
