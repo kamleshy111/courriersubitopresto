@@ -19,8 +19,9 @@
         </div>
 
         {!! Form::text('password', 'Mot de passe')->type('password')->readonly($readonly) !!}
-        {!! Form::text('password_confirmation', 'Mot de passe confirmation')->type('password')->readonly($readonly) !!}
-
+        @if(Auth::user()->hasRole('admin') === true)
+            {!! Form::text('password_confirmation', 'Mot de passe confirmation')->type('password')->readonly($readonly) !!}
+        @endif
         {{-- show only admin--}}
         @if(Auth::user()->hasRole('admin'))
             {!! Form::select('roles', 'Roles', $roles)->multiple()->readonly($readonly) !!}
