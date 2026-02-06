@@ -1735,7 +1735,11 @@ public function uploadPickupImageUpdated(Request $request, $waybillId)
         if ($files && count($files) > 0) {
             foreach ($files as $file) {
                 if ($file->isValid()) {
-                    $paths[] = $file->store('pickup_images', 'public');
+                    $stored = $file->store('pickup_images', 'public');
+                    // normalize any accidental double slashes
+                    $stored = preg_replace('~/{2,}~', '/', (string) $stored);
+                    $stored = ltrim($stored, '/');
+                    $paths[] = $stored;
                 }
             }
             if (empty($paths)) {
@@ -1753,12 +1757,16 @@ public function uploadPickupImageUpdated(Request $request, $waybillId)
             }
             $imageName = 'pickup_image_' . time() . '.jpg';
             $path = 'pickup_images/' . $imageName;
+            $path = preg_replace('~/{2,}~', '/', (string) $path);
+            $path = ltrim($path, '/');
             Storage::disk('public')->put($path, $image);
         }
         // ✅ Single file (backward compat)
         elseif ($request->hasFile('pickup_image') && $request->file('pickup_image')->isValid()) {
             $file = $request->file('pickup_image');
             $path = $file->store('pickup_images', 'public');
+            $path = preg_replace('~/{2,}~', '/', (string) $path);
+            $path = ltrim($path, '/');
         } else {
             return response()->json(['success' => false, 'message' => 'No image provided.']);
         }

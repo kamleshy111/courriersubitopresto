@@ -179,17 +179,29 @@
 
                                     <p>Signature: <span style="margin-top: -50px; text-align: center; border-bottom: 1px solid black; padding-bottom: 2px; display: inline-block; width: 100px; margin-right:15px;">{{ $waybill->sender_textSignature ? $waybill->sender_textSignature : " " }}</span>Heure: <span style="margin-left: 10px;"> {{ $waybill->pickup_time ? date('H:i', strtotime($waybill->pickup_time)) : '____________' }} </span>
 
-                            @if($waybill->pickup_image)
+                            @php
+                                // On this page, show only ONE pickup image (first if multiple)
+                                $firstPickupImg = null;
+                                if (!empty($waybill->pickup_image)) {
+                                    $raw = $waybill->pickup_image;
+                                    if (is_string($raw) && substr(trim($raw), 0, 1) === '[') {
+                                        $arr = json_decode($raw, true);
+                                        $firstPickupImg = is_array($arr) && count($arr) > 0 ? $arr[0] : null;
+                                    } else {
+                                        $firstPickupImg = $raw;
+                                    }
+                                }
+                                $firstPickupImg = $firstPickupImg
+                                    ? ltrim(preg_replace('~/{2,}~', '/', (string) $firstPickupImg), '/')
+                                    : null;
+                            @endphp
 
-                                    {{--<div style="text-align: center;">--}}
-                                    <a href="{{ asset('storage/' . $waybill->pickup_image) }}" target="_blank">
-
-                                <img src="{{ asset('storage/' . $waybill->pickup_image) }}" alt="Pickup Image" class="img-thumbnail" width="100" style="display: inline; margin-left:25px;">
+                            @if($firstPickupImg)
+                                <a href="{{ asset('storage/' . $firstPickupImg) }}" target="_blank">
+                                    <img src="{{ asset('storage/' . $firstPickupImg) }}" alt="Pickup Image" class="img-thumbnail" width="100" style="display: inline; margin-left:25px; margin-bottom:5px; max-height:120px; object-fit:cover;">
                                 </a>
-
-                                {{--</div>--}}
-
-                            @endif</p>
+                            @endif
+                            </p>
 
 
 
