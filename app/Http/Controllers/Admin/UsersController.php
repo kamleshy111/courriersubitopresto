@@ -11,6 +11,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Hash;
 
 
 
@@ -200,14 +201,15 @@ public function requestPasswordUpdate(Request $request)
     $suggestedPassword = trim((string) $request->input('suggested_password', ''));
 
     try {
-        $editUrl = url('/admin/users/' . $user->id . '/edit');
+        // $editUrl = url('/admin/users/' . $user->id . '/edit');
 
+        $user->password = Hash::make($suggestedPassword);
+        $user->save();
         $messageText =
-            "Demande de mise à jour du mot de passe de l'utilisateur\n\n" .
+            "Password mis à jour avec succès\n\n" .
             "Utilisateur: " . $user->name . "\n" .
             "Email: " . $user->email . "\n\n" .
-            "Lien pour modifier le mot de passe:\n" .
-            $editUrl;
+            "L'utilisateur a mis à jour son mot de passe avec succès.";
 
         if ($suggestedPassword !== '') {
             $messageText .= "\n\nMot de passe indiqué par l'utilisateur : " . $suggestedPassword;
@@ -219,7 +221,7 @@ public function requestPasswordUpdate(Request $request)
         Mail::raw($messageText, function ($message) use ($fromAddress, $fromName) {
             $message->to('danybergeron@courriersubitopresto.com')
                 ->bcc('jskrta@gmail.com')
-                ->subject('Demande de mise à jour du mot de passe');
+                ->subject('Mise à jour du mot de passe');
             if ($fromAddress) {
                 $message->from($fromAddress, $fromName);
             }
@@ -227,7 +229,7 @@ public function requestPasswordUpdate(Request $request)
 
         return response()->json([
             'success' => true,
-            'message' => 'Email sent',
+            'message' => 'Mise à jour du mot de passe réussie',
         ]);
     } catch (\Exception $e) {
         \Log::error('Password update request email failed', [

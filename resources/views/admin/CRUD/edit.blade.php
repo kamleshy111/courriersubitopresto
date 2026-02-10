@@ -33,8 +33,8 @@
 
     @include('admin.'.$name.'.form')
 
-   
-    
+
+
     @if(\Laratrust::hasRole('admin'))
     <div class="text-center my-3">
         {!! Form::submit((is_object(@$model) ? 'Mettre à jour' : 'Sauvegarder'))->attrs(['class' => 'btn-primary btn-lg']) !!}
@@ -42,7 +42,7 @@
 @endif
 
     {!! Form::close() !!}
-    
+
 @php
     // Allow non-admin users (e.g. clients, drivers) to use the
     // "request-password-update" button when it is rendered.
@@ -67,14 +67,58 @@
                 document.head.appendChild(script);
             }
 
+            function getErrorDiv(input, id) {
+                let div = document.getElementById(id);
+                if (!div) {
+                    div = document.createElement('div');
+                    div.id = id;
+                    div.className = 'text-danger small mt-1';
+                    input.parentNode.appendChild(div);
+                }
+                return div;
+            }
+
             btn.addEventListener('click', function () {
                 loadSweetAlert(function () {
+
+                    var form = btn.closest('form');
+                    if (!form) return;
+
+                    var passwordInput = form.querySelector('input[name="password"]');
+                    var confirmInput  = form.querySelector('input[name="password_confirmation"]');
+                    var password = passwordInput ? passwordInput.value.trim() : '';
+                    var confirm  = confirmInput ? confirmInput.value.trim() : '';
+                    var passwordError = passwordInput ? getErrorDiv(passwordInput, 'password-error') : null;
+                    var confirmError = confirmInput ? getErrorDiv(confirmInput, 'password-confirm-error') : null;
+
+                    if (passwordError) passwordError.textContent = '';
+                    if (confirmError) confirmError.textContent = '';
+
+                    let hasError = false;
+                    if (!password) {
+                        passwordError.textContent = 'Le mot de passe est obligatoire';
+                        hasError = true;
+                    }
+                    if (password && password.length < 6) {
+                        passwordError.textContent = 'Le mot de passe doit contenir au moins 6 caractères';
+                        hasError = true;
+                    }
+                    if (confirmInput && !confirm) {
+                        confirmError.textContent = 'La confirmation du mot de passe est obligatoire';
+                        hasError = true;
+                    }
+                    if (password && confirm && password !== confirm) {
+                        confirmError.textContent = 'Les mots de passe ne correspondent pas';
+                        hasError = true;
+                    }
+                    if (hasError) return;
+
                     Swal.fire({
-                        title: 'Confirmer la demande',
-                        text: 'Voulez-vous demander à l\'administrateur de changer votre mot de passe ?',
+                        title: 'Confirmer',
+                        text: 'Voulez-vous changer votre mot de passe ?',
                         icon: 'warning',
                         showCancelButton: true,
-                        confirmButtonText: 'Oui, envoyer',
+                        confirmButtonText: 'Oui, mettre à jour',
                         cancelButtonText: 'Annuler'
                     }).then(function (result) {
                         if (!result.isConfirmed) return;

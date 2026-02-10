@@ -1,10 +1,10 @@
 <div class="row">
     <div class="col-lg-6 col-sm-12">
-        
+
         {{-- old working
-        
+
         {!! Form::text('id', 'ID')->readonly(true) !!} --}}
-        
+
         {!! Form::text('id', 'ID')
     ->readonly(!( auth()->check() && auth()->user()->hasRole('admin') && ($isCreate ?? false) )) !!}
 
@@ -19,7 +19,7 @@
         </div>
 
         {!! Form::text('password', 'Mot de passe')->type('password')->readonly($readonly) !!}
-        @if(Auth::user()->hasRole('admin') === true)
+        @if(Auth::user()->hasRole(['admin', 'client']))
             {!! Form::text('password_confirmation', 'Mot de passe confirmation')->type('password')->readonly($readonly) !!}
         @endif
         {{-- show only admin--}}
@@ -40,7 +40,7 @@
     >
         Demander la mise a jour du mot de passe
     </button>
-    
+
 @endif
 
 @push('js')
