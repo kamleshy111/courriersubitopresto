@@ -2157,8 +2157,8 @@ public function labelPreviewPdf(Request $request, $id)
         'margin_bottom' => 3,
     ]);
 
+    $pdf->AddPage();
     for ($i = 1; $i <= $labelCount; $i++) {
-        $pdf->AddPage();
         $html = view(
             'admin.waybills.waybillLabelPdf',
             [

@@ -175,14 +175,15 @@ class WaybillController extends Controller
 
                 if($request->query('waybill-type') && $request->query('waybill-type') == "true"){
 
-                    $button .= '<a class="btn btn-sm btn-primary" style="background-color:#FF5733;" target="_blank" href="' . url('admin/waybills/' . $row->id . '?waybill=' . \request()->query('waybill-type')) . '"><i class="fas fa-file-pdf"></i> Bordereau</a>';
+                    $button .= '<a class="btn btn-sm btn-primary" style="background-color:#FF5733; margin-right: 3px;" target="_blank" href="' . url('admin/waybills/' . $row->id . '?waybill=' . \request()->query('waybill-type')) . '"><i class="fas fa-file-pdf"></i> Bordereau</a>';
 
                 }
 
                 if($request->query('waybill-type') && $request->query('waybill-type') == "true"){
 
-                    $button .= '<a class="btn btn-sm btn-primary"  target="_blank" href="' . url('admin/waybill/' . $row->id) . '"><i class="fas fa-eye"></i> Voir Waybill</a>';
+                    $button .= '<a class="btn btn-sm btn-primary"  target="_blank" href="' . url('admin/waybill/' . $row->id) . '" style="margin-right: 3px;"><i class="fas fa-eye"></i> Voir Waybill</a>';
 
+                    $button .= '<button type="button" class="btn btn-sm btn-secondary btn-view-box-waybill" title="voir l`étiquette" style="margin-right: 3px;" data-waybill-id="' . $row->id . '"> <i class="fa fa-print"></i></button>';
 
                 }
 
