@@ -58,8 +58,10 @@ td { vertical-align: top; }
                         @else — @endif
                     </td>
                     <td style="text-align: right; width: 35%;">
-                        <div style="font-size: 14pt; font-weight: bold; margin-bottom: 1mm;">{{ $waybill->user && $waybill->user->client ? $waybill->user->client->prefix . str_pad($waybill->soft_id, 6, '0', STR_PAD_LEFT) : str_pad($waybill->soft_id ?? $waybill->id, 6, '0', STR_PAD_LEFT) }}</div>
-                        <span style="font-size: 10pt; font-weight: bold; border: 1px solid #000; padding: 0.5mm 1.5mm;">{{ $pageNo }}/{{ $totalPage }}</span>
+                        <div style="font-size: 14pt; font-weight: bold; padding: 0.5mm 1.5mm; margin-bottom: 1mm; min-width: 40mm; text-align: center;">
+                            {{ $waybill->user && $waybill->user->client ? $waybill->user->client->prefix . str_pad($waybill->soft_id, 6, '0', STR_PAD_LEFT) : str_pad($waybill->soft_id ?? $waybill->id, 6, '0', STR_PAD_LEFT) }}
+                        </div>
+                        <div style="font-size: 14pt; font-weight: bold; border: 1px solid #000; padding: 0.5mm 1.5mm; min-width: 55mm; text-align: center;">{{ $pageNo }}/{{ $totalPage }}</div>
                     </td>
                 </tr>
             </table>
@@ -71,7 +73,7 @@ td { vertical-align: top; }
     </tr>
     <tr>
         <td colspan="4" style="padding: 2mm; border-top: 1px solid #ccc;">
-            <div style="font-size: 10pt; font-weight: bold; line-height: 1.2; text-transform: uppercase;">
+            <div style="font-size: 11pt; font-weight: bold; line-height: 1.2; text-transform: uppercase;">
                 @if($recipient)
                     {{ strtoupper($recipient->name ?? 'N/A') }}<br>
                     {{ strtoupper($recipient->address ?? '') }}{{ !empty($recipient->address_ext) ? ', ' . strtoupper($recipient->address_ext) : '' }}<br>

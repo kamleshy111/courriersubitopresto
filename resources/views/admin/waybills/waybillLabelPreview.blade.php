@@ -126,7 +126,7 @@
 }
 
 .waybill-label-preview .return-address {
-    font-size: 9pt;
+    font-size: 15pt;
     line-height: 1.2;
     flex: 1;
     min-width: 0;
@@ -146,11 +146,11 @@
 }
 
 .waybill-label-preview .code-c005 {
-    font-size: 10pt;
+    font-size: 14pt;
     font-weight: bold;
     border: 1px solid #000;
     padding: 0.02in 0.06in;
-    display: inline-block;
+    /* display: inline-block; */
 }
 
 .waybill-label-preview .tracking-section {
@@ -168,14 +168,14 @@
 }
 
 .waybill-label-preview .tracking-number {
-    font-size: 12pt;
+    font-size: 13pt;
     font-weight: bold;
     letter-spacing: 1px;
     margin-bottom: 0.04in;
 }
 
 .waybill-label-preview .to-address {
-    font-size: 10pt;
+    font-size: 16pt;
     line-height: 1.2;
     font-weight: bold;
     text-transform: uppercase;
