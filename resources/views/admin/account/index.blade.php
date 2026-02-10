@@ -108,7 +108,7 @@
 
                 <div class="col-md-6">
 
-                    <a href="{{ route('admin.profile.index')}}">
+                    <a href="{{ auth()->user()->hasRole('admin') ? route('admin.profile.index') : url('admin/my-profile') }}">
                         <div class="card" style="border-radius: 14px; background-color: #de7d55; width: 100%; height: 134px;">
 
                             <div class="card-body">
