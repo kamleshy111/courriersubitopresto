@@ -33,8 +33,8 @@
 
     @include('admin.'.$name.'.form')
 
-   
-    
+
+
     @if(\Laratrust::hasRole('admin'))
     <div class="text-center my-3">
         {!! Form::submit((is_object(@$model) ? 'Mettre à jour' : 'Sauvegarder'))->attrs(['class' => 'btn-primary btn-lg']) !!}
@@ -42,70 +42,120 @@
 @endif
 
     {!! Form::close() !!}
-    
-   @if(\Laratrust::hasRole('client'))
-<script>
-(function () {
 
-    var btn = document.getElementById('request-password-update');
-    if (!btn) return;
+@php
+    // Allow non-admin users (e.g. clients, drivers) to use the
+    // "request-password-update" button when it is rendered.
+    $canRequestPasswordUpdate = auth()->check() && !auth()->user()->hasRole('admin');
+@endphp
 
-    function loadSweetAlert(callback) {
-        if (window.Swal) {
-            callback();
-            return;
-        }
+@if($canRequestPasswordUpdate)
+    <script>
+        (function () {
+            var btn = document.getElementById('request-password-update');
+            if (!btn) return;
 
-        var script = document.createElement('script');
-        script.src = 'https://cdn.jsdelivr.net/npm/sweetalert2@11';
-        script.onload = callback;
-        document.head.appendChild(script);
-    }
+            function loadSweetAlert(callback) {
+                if (window.Swal) {
+                    callback();
+                    return;
+                }
 
-    btn.addEventListener('click', function () {
+                var script = document.createElement('script');
+                script.src = 'https://cdn.jsdelivr.net/npm/sweetalert2@11';
+                script.onload = callback;
+                document.head.appendChild(script);
+            }
 
-        loadSweetAlert(function () {
+            function getErrorDiv(input, id) {
+                let div = document.getElementById(id);
+                if (!div) {
+                    div = document.createElement('div');
+                    div.id = id;
+                    div.className = 'text-danger small mt-1';
+                    input.parentNode.appendChild(div);
+                }
+                return div;
+            }
 
-            Swal.fire({
-                title: 'Confirmer la demande',
-                text: 'Voulez-vous demander a l administrateur de changer votre mot de passe ?',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Oui, envoyer',
-                cancelButtonText: 'Annuler'
-            }).then(function (result) {
+            btn.addEventListener('click', function () {
+                loadSweetAlert(function () {
 
-                if (!result.isConfirmed) return;
+                    var form = btn.closest('form');
+                    if (!form) return;
 
-                fetch(btn.dataset.url, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                        'Accept': 'application/json'
+                    var passwordInput = form.querySelector('input[name="password"]');
+                    var confirmInput  = form.querySelector('input[name="password_confirmation"]');
+                    var password = passwordInput ? passwordInput.value.trim() : '';
+                    var confirm  = confirmInput ? confirmInput.value.trim() : '';
+                    var passwordError = passwordInput ? getErrorDiv(passwordInput, 'password-error') : null;
+                    var confirmError = confirmInput ? getErrorDiv(confirmInput, 'password-confirm-error') : null;
+
+                    if (passwordError) passwordError.textContent = '';
+                    if (confirmError) confirmError.textContent = '';
+
+                    let hasError = false;
+                    if (!password) {
+                        passwordError.textContent = 'Le mot de passe est obligatoire';
+                        hasError = true;
                     }
-                })
-                .then(function(r){ return r.json(); })
-                .then(function(data){
+                    if (password && password.length < 6) {
+                        passwordError.textContent = 'Le mot de passe doit contenir au moins 6 caractères';
+                        hasError = true;
+                    }
+                    if (confirmInput && !confirm) {
+                        confirmError.textContent = 'La confirmation du mot de passe est obligatoire';
+                        hasError = true;
+                    }
+                    if (password && confirm && password !== confirm) {
+                        confirmError.textContent = 'Les mots de passe ne correspondent pas';
+                        hasError = true;
+                    }
+                    if (hasError) return;
 
-                    Swal.fire(
-                        data.success ? 'Demande envoyee' : 'Erreur',
-                        data.success ? 'L administrateur a recu votre demande.' : (data.message || 'Erreur lors de l envoi'),
-                        data.success ? 'success' : 'error'
-                    );
+                    Swal.fire({
+                        title: 'Confirmer',
+                        text: 'Voulez-vous changer votre mot de passe ?',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Oui, mettre à jour',
+                        cancelButtonText: 'Annuler'
+                    }).then(function (result) {
+                        if (!result.isConfirmed) return;
 
-                })
-                .catch(function(){
-                    Swal.fire('Erreur', 'Impossible de contacter le serveur', 'error');
+                        var form = btn.closest('form');
+                        var passwordInput = form ? form.querySelector('input[name="password"]') : null;
+                        var passwordValue = (passwordInput && passwordInput.value && passwordInput.value.trim()) ? passwordInput.value.trim() : '';
+
+                        var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                        var body = { _token: csrfToken };
+                        if (passwordValue) body.suggested_password = passwordValue;
+
+                        fetch(btn.dataset.url, {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': csrfToken,
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(body)
+                        })
+                        .then(function (r) { return r.json(); })
+                        .then(function (data) {
+                            Swal.fire(
+                                data.success ? 'Demande envoyee' : 'Erreur',
+                                data.success ? 'L administrateur a recu votre demande.' : (data.message || 'Erreur lors de l envoi'),
+                                data.success ? 'success' : 'error'
+                            );
+                        })
+                        .catch(function () {
+                            Swal.fire('Erreur', 'Impossible de contacter le serveur', 'error');
+                        });
+                    });
                 });
-
             });
-
-        });
-
-    });
-
-})();
-</script>
+        })();
+    </script>
 @endif
 
 
