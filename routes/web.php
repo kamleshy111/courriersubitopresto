@@ -123,6 +123,8 @@ Route::name('admin.')->prefix('admin')->middleware(['auth'])->group(function() {
     // new route for drop image added below
     Route::post('waybills/{id}/upload-drop-image-updated', [\App\Http\Controllers\Admin\WaybillsController::class, 'uploadDropImageUpdated'])->name('waybills.uploadDropImageUpdated');
     Route::post('waybills/{id}/delivered', [\App\Http\Controllers\Admin\WaybillsController::class, 'markDelivered'])->name('waybills.markDelivered');
+    Route::get('waybill/{id}/label-preview/pdf', [\App\Http\Controllers\Admin\WaybillsController::class, 'labelPreviewPdf'])->name('waybill.label-preview.pdf');
+    Route::get('waybill/{id}/label-preview', [\App\Http\Controllers\Admin\WaybillsController::class, 'waybillLabelPreview'])->name('waybill.label-preview');
     Route::get('waybill/{id}', [\App\Http\Controllers\Admin\WaybillsController::class, 'waybillPageView']);
     // new ribbon update in admin table
     Route::post('/waybills/mark-as-viewed/{id}', [\App\Http\Controllers\Admin\WaybillsController::class, 'markAsViewed']);

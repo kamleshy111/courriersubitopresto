@@ -69,6 +69,12 @@ class WaybillsController extends CRUDController {
         Log::info('Store request data:', $request->all());
         $waybillType = "true";
         $new = $request->all();
+
+        if ($request->boolean('save_and_preview')) {
+            $request->validate(['label_count' => 'required|integer|min:1|max:100']);
+        }
+        $labelCount = max(1, min(100, (int) $request->input('label_count', 1)));
+
         for($i = 0; $i <= $request->input('counter', 0); $i++) {
             // if (isset($request[$i]['round_trip_1']) && $request[$i]['round_trip_1'] == '1')
             //     {
@@ -109,9 +115,8 @@ class WaybillsController extends CRUDController {
 } else {
 
     unset($rules['user_id']); // make sure it's not required
-    $validator = Validator::make($request->except(['counter']), (new $this->model())->rules);
+    $validator = Validator::make($request->except(['counter', 'save_and_preview', 'label_count']), (new $this->model())->rules);
     $validator_checker = $validator->fails();
-
     // Fix Log line
     Log::info('Validation checker:', ['value' => $validator_checker]);
     Log::info('user_id for regular waybill', [
@@ -136,6 +141,8 @@ class WaybillsController extends CRUDController {
             Log::info('validated.');
             $waybillsToSend = [];
             $waybillsToPrint = [];
+            $saveAndPreview = $request->boolean('save_and_preview');
+            $firstWaybillId = null;
             for($i = 0; $i <= $request->get('counter', 0); $i++) {
                 // store
                 $model = new $this->model();
@@ -413,6 +420,13 @@ class WaybillsController extends CRUDController {
 
                 }
                 $waybillsToPrint[] = $model->id;
+                if ($saveAndPreview && $firstWaybillId === null) {
+                    $firstWaybillId = $model->id;
+                }
+            }
+
+            if ($saveAndPreview && $firstWaybillId) {
+                return redirect()->route('admin.waybill.label-preview', ['id' => $firstWaybillId, 'label_count' => $labelCount]);
             }
 
             if(!empty($waybillsToSend)) {
@@ -813,7 +827,7 @@ class WaybillsController extends CRUDController {
                 'type'             => 0,
                 // 'submission_approval_date' => date('Y-m-d')
                 'submission_approval_date' => now()->toDateString(),  // ✔ correct for DATE
-                'date' => now()->toDateString(),  // ✔ correct for DATE
+                // 'date' => now()->toDateString(),  // ✔ correct for DATE
 
             ]);
             EmailWaybillQueue::create([
@@ -2158,6 +2172,69 @@ public function markDelivered($id)
 
     // Redirect back with a success message
     return redirect()->back()->with('success', 'Waybill marked as delivered');
+}
+
+// public function waybillLabelPreview($id)
+// {
+//     $waybill = Waybill::with(['shipper', 'recipient', 'user.client'])->findOrFail($id);
+//     $shipper = $waybill->shipper;
+//     $recipient = $waybill->recipient;
+//     return view('admin.waybills.waybillLabelPreview', compact('waybill', 'shipper', 'recipient'));
+// }
+
+public function waybillLabelPreview(Request $request, $id)
+{
+    $waybill = Waybill::with(['shipper', 'recipient', 'user.client'])->findOrFail($id);
+    $shipper = $waybill->shipper;
+    $recipient = $waybill->recipient;
+
+    $labelCount = max(1, min(100, (int) $request->query('label_count', 1)));
+    $labels = range(1, $labelCount);
+
+    return view('admin.waybills.waybillLabelPreview', compact('waybill', 'shipper', 'recipient', 'labels'));
+}
+
+
+public function labelPreviewPdf(Request $request, $id)
+{
+    $waybill = Waybill::with(['shipper', 'recipient', 'user.client'])->findOrFail($id);
+    $shipper = $waybill->shipper;
+    $recipient = $waybill->recipient;
+    $labelCount = max(1, min(100, (int) $request->query('label_count', 1)));
+
+    // $html = view('admin.waybills.waybillLabelPdf', compact('waybill', 'shipper', 'recipient'))->render();
+
+    $pdf = new Mpdf([
+        'format' => [101.6, 152.4],
+        'margin_left' => 3,
+        'margin_right' => 3,
+        'margin_top' => 3,
+        'margin_bottom' => 3,
+    ]);
+
+    $pdf->AddPage();
+    for ($i = 1; $i <= $labelCount; $i++) {
+        $html = view(
+            'admin.waybills.waybillLabelPdf',
+            [
+                'waybill'   => $waybill,
+                'shipper'   => $shipper,
+                'recipient' => $recipient,
+                'pageNo'    => $i,
+                'totalPage' => $labelCount,
+            ]
+        )->render();
+        $pdf->WriteHTML($html);
+    }
+
+    $pdf->SetTitle('Bordereau #' . $waybill->id);
+    $pdf->SetDisplayMode('fullpage');
+
+    $filename = 'bordereau_' . str_pad($waybill->id, 7, '0', STR_PAD_LEFT) . '.pdf';
+    return response($pdf->Output('', 'S'), 200, [
+        'Content-Type' => 'application/pdf',
+        'Content-Disposition' => 'inline; filename="' . $filename . '"',
+    ]);
 }
 
 public function waybillPageView($waybillNumber) {

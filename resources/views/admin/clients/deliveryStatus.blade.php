@@ -43,7 +43,7 @@ update buttons & table field according instructions
     font-size: 0.75rem; /* Adjust as needed */
     color: #999; /* Optional: lighter color */
 
-
+     }
 
     </style>
 
@@ -118,7 +118,7 @@ update buttons & table field according instructions
         <input type="text" id="filterName" class="form-control w-auto" placeholder="Nom d’expéditeur ou destinataire">
 
         <button id="searchByNameButton" class="btn btn-primary">🔎 Chercher par nom</button>--}}
-        
+
         <label for="filterName" class="me-2">🔍 Chercher par nom:</label>
 <input type="text" id="filterName" class="form-control w-auto" placeholder="Nom d’expéditeur ou destinataire">
 
@@ -140,11 +140,11 @@ update buttons & table field according instructions
             <button id="resetButton" class="btn btn-secondary">♻️ Réinitialiser</button>
          </div>
     </div>
-    
-    
+
+
     <script>
 
-   
+
 // new
 
 const filterNameInput = document.getElementById('filterName');
@@ -448,7 +448,7 @@ document.addEventListener('DOMContentLoaded', function () {
 </script>
 
 
-    
+
 @else
     {{--<div class="mb-3 d-flex align-items-center">
         <label for="filterDate" class="me-2">📅 Recherche par date:</label>
@@ -485,7 +485,7 @@ document.addEventListener('DOMContentLoaded', function () {
 <?php
 // dd(\Auth::id()); // Check the authenticated user ID
 
-// dd($waybills); 
+// dd($waybills);
 ?>
 
  <table class="table table-bordered table-striped">
@@ -499,7 +499,7 @@ document.addEventListener('DOMContentLoaded', function () {
         </tr>
     </thead>
     <tbody id="waybillTable">
-        
+
         @forelse($waybills as $waybill)
             <tr>
                 <td>{{ $waybill->shipper->name }}</td>
@@ -533,7 +533,7 @@ document.addEventListener('DOMContentLoaded', function () {
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
-    
+
     <script>
         let signaturePad, canvas;
 

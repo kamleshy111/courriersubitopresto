@@ -6,7 +6,7 @@
 
     @section('title', 'Bordereaux' . ': ' . (is_object(@$model) ? 'modification' : 'création'))
 
-@elseif(Request::query('waybill') == "true")
+@elseif(Request::query('waybill') == "false")
 
     @section('title', 'Soumissions' . ': ' . (is_object(@$model) ? 'modification' : 'création'))
 
@@ -78,6 +78,7 @@
 
     {!! Form::hidden('counter', 0) !!}
 
+    <input type="hidden" name="label_count" id="label_count_input" value="1">
 
 
     @include('admin.' . $name . '.form')
@@ -116,11 +117,16 @@
 
             @if(Request::query('waybill') == "true")
 
-                {!! Form::submit(is_object(@$model) ? 'Mettre à jour' : 'Sauvegarder et envoyer*  nre')->attrs([
+                {!! Form::submit(is_object(@$model) ? 'Mettre à jour' : 'Sauvegarder et envoyer*')->attrs([
 
             'class' => 'btn-primary btn-lg',
 
         ]) !!}
+
+                @if (!isset($model))
+                    <button type="submit" id="realSubmitBtn" name="save_and_preview" value="1" class="btn btn-lg btn-info ml-2 d-none">Sauvegarder et aperçu</button>
+                    <button type="button" id="savePreviewBtn" class="btn btn-lg btn-info ml-2"> Sauvegarder et aperçu</button>
+                @endif
 
             @else
 
@@ -137,6 +143,26 @@
     </div>
 
     {!! Form::close() !!}
+
+    <div class="modal fade" id="previewModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Waybill aperçu</h5>
+                </div>
+                <div class="modal-body">
+                    <label for="modal_label_count">Nombre d'étiquettes :</label>
+                    <input type="number" class="form-control" id="modal_label_count" placeholder="Entrez le nombre d'étiquettes (1-100)" min="1" max="100" required>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" onclick="submitForm()">
+                        Confirmer et enregistrer
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
 @stop
 
@@ -187,6 +213,34 @@
             default_client: @json(Auth::user()->client)
 
         }
+
+        document.getElementById('savePreviewBtn').addEventListener('click', function () {
+
+            let form = document.getElementById('waybills-form');
+
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            $('#previewModal').modal('show');
+        });
+
+
+        function submitForm() {
+            var raw = document.getElementById('modal_label_count').value;
+            var labelCount = parseInt(raw, 10);
+            if (isNaN(labelCount) || labelCount < 1 || labelCount > 100) {
+                alert('Veuillez entrer un nombre d\'étiquettes entre 1 et 100.');
+                return;
+            }
+            document.getElementById('label_count_input').value = labelCount;
+            $('#previewModal').modal('hide');
+            document.getElementById('realSubmitBtn').click();
+        }
+
+
+
 
     </script>
 
