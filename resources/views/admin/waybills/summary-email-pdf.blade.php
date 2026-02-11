@@ -98,10 +98,23 @@
                                     <td colspan="2">
                                         {{--<p>Signature: _____________________________________ Heure: ____________</p>--}}
                                         <p>Signature: <span style="margin-top: -50px; text-align: center; border-bottom: 1px solid black; padding-bottom: 2px; display: inline-block; width: 100px; margin-right:20px;">{{ $sender_textSignature ? $sender_textSignature : " " }}</span> <span style="margin-left: 20px;"> Heure:  {{ $pickup_time ? date('H:i', strtotime($pickup_time)) : '____________' }} </span>
-                            @if($pickup_image)
-                                    
-                                <img src="{{ asset('storage/' . $pickup_image) }}" alt="Pickup Image" class="img-thumbnail" width="80" style="display: inline; margin-left:50px;">
-                                
+                            @php
+                                $firstPickupImg = null;
+                                if (!empty($pickup_image)) {
+                                    $rawPickup = $pickup_image;
+                                    if (is_string($rawPickup) && substr(trim($rawPickup), 0, 1) === '[') {
+                                        $arrPickup = json_decode($rawPickup, true);
+                                        $firstPickupImg = is_array($arrPickup) && count($arrPickup) > 0 ? $arrPickup[0] : null;
+                                    } else {
+                                        $firstPickupImg = $rawPickup;
+                                    }
+                                }
+                                $firstPickupImg = $firstPickupImg
+                                    ? ltrim(preg_replace('~/{2,}~', '/', (string) $firstPickupImg), '/')
+                                    : null;
+                            @endphp
+                            @if($firstPickupImg)
+                                <img src="{{ asset('storage/' . $firstPickupImg) }}" alt="Pickup Image" class="img-thumbnail" width="80" style="display: inline; margin-left:50px;">
                             @endif</p>
                                         </td>
                                     
@@ -158,10 +171,25 @@
                                         
                                         
                                         <p>Signature: <span style="margin-top: -50px; text-align: center; border-bottom: 1px solid black; padding-bottom: 2px; display: inline-block; width: 100px; margin-right:20px;">{{ $receiver_textSignature ? $receiver_textSignature : "____________" }}</span> <span style="margin-left: 20px;"> Heure: {{ $drop_time ? date('H:i', strtotime($drop_time)) : '____________' }} </span>
-                                         @if($drop_image)
-                                    
-                                <img src="{{ asset('storage/' . $drop_image) }}" alt="Pickup Image" class="img-thumbnail" width="80" style="display: inline; margin-left:50px;">
-                                
+                            @php
+                                $lastDropImg = null;
+                                if (!empty($drop_image)) {
+                                    $rawDrop = $drop_image;
+                                    if (is_string($rawDrop) && substr(trim($rawDrop), 0, 1) === '[') {
+                                        $arrDrop = json_decode($rawDrop, true);
+                                        if (is_array($arrDrop) && count($arrDrop) > 0) {
+                                            $lastDropImg = end($arrDrop); // latest image
+                                        }
+                                    } else {
+                                        $lastDropImg = $rawDrop;
+                                    }
+                                }
+                                $lastDropImg = $lastDropImg
+                                    ? ltrim(preg_replace('~/{2,}~', '/', (string) $lastDropImg), '/')
+                                    : null;
+                            @endphp
+                            @if($lastDropImg)
+                                <img src="{{ asset('storage/' . $lastDropImg) }}" alt="Drop Image" class="img-thumbnail" width="80" style="display: inline; margin-left:50px;">
                             @endif</p>
                                         </td>
                                 </tr>

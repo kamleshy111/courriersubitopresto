@@ -228,18 +228,23 @@
 
                             <div class="upload-section">
                                 <h5>{{__('translations.Televerser')}} l’image pour ramassage</h5>
-                                @if($waybill->pickup_image)
-                                    <img src="{{ asset('storage/' . $waybill->pickup_image) }}" alt="Pickup Image" class="img-thumbnail" width="500">
-                                @endif
-                                <div class="d-flex align-items-center gap-2 mb-2">
-                                    <!-- Step 1: Capture Button (Camera Icon) -->
-                                    {{-- <span>1.</span> --}}
+                                @php
+                                    $pickupImages = [];
+                                    if (!empty($waybill->pickup_image)) {
+                                        $raw = $waybill->pickup_image;
+                                        $pickupImages = (is_string($raw) && substr(trim($raw), 0, 1) === '[') ? json_decode($raw, true) : [$raw];
+                                        if (!is_array($pickupImages)) $pickupImages = [$raw];
+                                    }
+                                @endphp
+                                @foreach($pickupImages as $pickupImg)
+                                    <img src="{{ asset('storage/' . $pickupImg) }}" alt="Pickup Image" class="img-thumbnail mr-1 mb-1" width="120" style="max-height:120px;object-fit:cover;">
+                                @endforeach
+                                <div class="d-flex align-items-center gap-2">
                                     <button type="button" id="openCameraButton" class="btn btn-sm btn-primary ml-2">
                                         <i class="fas fa-camera"></i> Prendre photo
                                     </button>
-
-                                    {{--<input type="file" id="pickup_file_input"  class="form-control form-control-sm" style="max-width: 500px;" /> --}}
-                                    <input type="file" id="pickup_file_input" accept="image/*" capture="environment" class="form-control form-control-sm" style="max-width:500px;" />
+                                    <input type="file" id="pickup_file_input" name="pickup_image[]" accept="image/*" class="form-control form-control-sm" style="max-width:500px;" multiple />
+                                    
 
 
                                     <!-- Step 2: Upload Button -->
@@ -247,6 +252,9 @@
                                     <button type="button" id="uploadButton" class="btn btn-sm btn-primary ml-2">
                                         <i class="fas fa-upload"></i> {{__('translations.Televerser')}}
                                     </button> --}}
+                                </div>
+                                <div class="est" style="margin-left:143px; ">
+                                    <span class="text-muted small">(appareil photo ou jusqu'à 5 fichiers, puis Sauvegarder)</span>
                                 </div>
 
                                 <!-- Camera section (hidden by default) -->
@@ -318,9 +326,28 @@
 
                     <div class="upload-section">
                         <h5>{{__('translations.Televerser')}} l’image de {{__('translations.reception')}}</h5>
-                        @if($waybill->drop_image)
-                                <img src="{{ asset('storage/' . $waybill->drop_image) }}" alt="Drop Image" class="img-thumbnail">
+                        @php
+                            $dropImages = [];
+                            if (!empty($waybill->drop_image)) {
+                                $rawDrop = $waybill->drop_image;
+                                if (is_string($rawDrop) && substr(trim($rawDrop), 0, 1) === '[') {
+                                    $arrDrop = json_decode($rawDrop, true);
+                                    $dropImages = is_array($arrDrop) ? $arrDrop : [];
+                                } else {
+                                    $dropImages = [$rawDrop];
+                                }
+                            }
+                        @endphp
+                        @foreach($dropImages as $img)
+                            @php
+                                $normalizedImg = $img
+                                    ? ltrim(preg_replace('~/{2,}~', '/', (string) $img), '/')
+                                    : null;
+                            @endphp
+                            @if($normalizedImg)
+                                <img src="{{ asset('storage/' . $normalizedImg) }}" alt="Drop Image" class="img-thumbnail mr-1 mb-1" width="120" style="max-height:120px;object-fit:cover;">
                             @endif
+                        @endforeach
                         <div class="d-flex align-items-center gap-2 mb-2">
                             <!-- Step 1: Capture Button (Camera Icon) -->
                             {{-- <span>1.</span> --}}
@@ -329,7 +356,15 @@
                             </button>
 
                             {{--<input type="file" id="drop_file_input"  class="form-control form-control-sm mt-2" style="max-width: 500px;" /> --}}
-                            <input type="file" id="drop_file_input" accept="image/*" capture="environment" class="form-control form-control-sm mt-2" style="max-width:500px;" />
+                            <input
+                                type="file"
+                                id="drop_file_input"
+                                name="drop_image[]"
+                                accept="image/*"
+                                class="form-control form-control-sm mt-2"
+                                style="max-width:500px;"
+                                multiple
+                            />
 
                             <!-- Step 2: Upload Button -->
                             {{-- <span class="ml-3">2.</span>
@@ -973,14 +1008,16 @@ function closeCamera() {
 
         // === Success ===
         document.getElementById('overlay').style.display = 'none';
+        const imgCount = (imageData && imageData.count) ? imageData.count : 1;
+        const msg = imgCount > 1 ? imgCount + ' images et signature enregistrées avec succès.' : 'Signature et image téléchargées avec succès.';
         Swal.fire({
             icon: 'success',
             title: 'Succès',
-            text: 'Signature et image téléchargées avec succès.',
+            text: msg,
             showConfirmButton: false,
-            timer: 1500,
+            timer: 1800,
             timerProgressBar: true
-        });
+        }).then(function() { window.location.reload(); });
 
     } catch (error) {
         console.error(error);
@@ -1018,18 +1055,20 @@ savePickupButton.addEventListener('click', async function () {
     const shipperSignature = shipperSignatureInput.value.trim();
 
     const pickupImageBase64 = document.getElementById('pickup_image_path')?.value || "";
-    const pickupFileInput = document.getElementById('pickup_file_input'); // File input
-    const uploadedFile = pickupFileInput?.files[0];
+    const pickupFileInput = document.getElementById('pickup_file_input');
+    const uploadedFiles = pickupFileInput?.files ? Array.from(pickupFileInput.files).slice(0, 5) : []; // max 5
 
     const span = document.getElementById('waybill-meta-{{ $waybill->id }}');
     const is_mira = span.dataset.isMira;
 
-    // === Validation ===
-    console.log("Base64 Image: ", pickupImageBase64); // Log the base64 value
-    console.log("Uploaded File: ", uploadedFile); // Log the uploaded file object
+    if (pickupFileInput?.files?.length > 5) {
+        alert("Veuillez sélectionner au maximum 5 images.");
+        document.getElementById('overlay').style.display = 'none';
+        return;
+    }
 
-    if (!pickupImageBase64 && !uploadedFile) {
-        alert("Please capture an image or upload one from gallery.");
+    if (!pickupImageBase64 && uploadedFiles.length === 0) {
+        alert("Veuillez prendre une photo ou choisir jusqu'à 5 images.");
         document.getElementById('overlay').style.display = 'none';
         return;
     }
@@ -1061,27 +1100,17 @@ savePickupButton.addEventListener('click', async function () {
 
         // === Submit Image ===
         let imageUploadResponse;
+        const formData = new FormData();
+        formData.append('is_mira', is_mira);
 
-        if (uploadedFile) {
-            // 📁 File from input — send as FormData
-            const formData = new FormData();
-            formData.append('pickup_image', uploadedFile);
-            formData.append('is_mira', is_mira);
-            
-            console.log(uploadedFile);
-            console.log(is_mira);
-            
-            
-            
-                imageUploadResponse = await fetch("{{ route('admin.waybills.uploadPickupImageUpdated', $waybill->id) }}", {
+        if (uploadedFiles.length > 0) {
+            // 📁 Up to 5 files from "Choose file"
+            uploadedFiles.forEach(function(file) { formData.append('pickup_image[]', file); });
+            imageUploadResponse = await fetch("{{ route('admin.waybills.uploadPickupImageUpdated', $waybill->id) }}", {
                 method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    // DO NOT set Content-Type here! The browser will set it automatically when using FormData
-                },
+                headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
                 body: formData
             });
-
         } else if (pickupImageBase64) {
             // 📷 Base64 from camera — send as JSON
             const imageBlob = base64ToBlob(pickupImageBase64);
@@ -1110,14 +1139,16 @@ savePickupButton.addEventListener('click', async function () {
 
         // === Success ===
         document.getElementById('overlay').style.display = 'none';
+        const imgCount = (imageData && imageData.count) ? imageData.count : 1;
+        const msg = imgCount > 1 ? imgCount + ' images et signature enregistrées avec succès.' : 'Signature et image téléchargées avec succès.';
         Swal.fire({
             icon: 'success',
             title: 'Succès',
-            text: 'Signature et image téléchargées avec succès.',
+            text: msg,
             showConfirmButton: false,
-            timer: 1500,
+            timer: 1800,
             timerProgressBar: true
-        });
+        }).then(function() { window.location.reload(); });
 
     } catch (error) {
         console.error(error);
@@ -1175,7 +1206,7 @@ savePickupButton.addEventListener('click', async function () {
     const cameraSectionReceiver = document.getElementById('cameraSectionReceiver');
     const openCameraButtonReceiver = document.getElementById('openCameraButtonReceiver');
     const uploadButtonReceiver = document.getElementById('uploadButtonReceiver');
-    const imageUploadFormReceiver = document.getElementById('imageUploadForm');
+    const imageUploadFormReceiver = document.getElementById('imageUploadFormReceiver');
     const dropImagePath = document.getElementById('drop_image_path');
     const capturedImageReceiver = document.getElementById('capturedImageReceiver');
     const canvasReceiver = document.getElementById('canvasReceiver');
@@ -1247,11 +1278,17 @@ saveDropButton.addEventListener('click', async function () {
 
     const dropImageBase64 = document.getElementById('drop_image_path')?.value || ""; // 📷 Camera base64
     const dropFileInput = document.getElementById('drop_file_input'); // 📁 File input
-    const uploadedFile = dropFileInput?.files[0];
+    const uploadedFiles = dropFileInput?.files ? Array.from(dropFileInput.files).slice(0, 5) : [];
+
+    if (dropFileInput?.files?.length > 5) {
+        alert("Veuillez sélectionner au maximum 5 images.");
+        document.getElementById('overlay').style.display = 'none';
+        return;
+    }
 
     // === Validation ===
-    if (!dropImageBase64 && !uploadedFile) {
-        alert("Please capture or upload a drop image.");
+    if (!dropImageBase64 && uploadedFiles.length === 0) {
+        alert("Please capture or upload at least one drop image.");
         document.getElementById('overlay').style.display = 'none';
         return;
     }
@@ -1284,10 +1321,12 @@ saveDropButton.addEventListener('click', async function () {
         // === Submit Drop Image ===
         let imageUploadResponse;
 
-        if (uploadedFile) {
-            // 📁 File input — send using FormData
+        if (uploadedFiles.length > 0) {
+            // 📁 Up to 5 files from "Choose file"
             const formData = new FormData();
-            formData.append('drop_image', uploadedFile);
+            uploadedFiles.forEach(function(file) {
+                formData.append('drop_image[]', file);
+            });
 
             imageUploadResponse = await fetch("{{ route('admin.waybills.uploadDropImageUpdated', $waybill->id) }}", {
                 method: 'POST',
@@ -1297,7 +1336,6 @@ saveDropButton.addEventListener('click', async function () {
                 },
                 body: formData
             });
-
         } else {
             // 📷 Base64 camera image — send as JSON
             imageUploadResponse = await fetch("{{ route('admin.waybills.uploadDropImageUpdated', $waybill->id) }}", {
@@ -1320,14 +1358,18 @@ saveDropButton.addEventListener('click', async function () {
 
         // === SUCCESS ===
         document.getElementById('overlay').style.display = 'none';
+        const imgCount = (imageData && imageData.count) ? imageData.count : 1;
+        const msg = imgCount > 1
+            ? imgCount + ' images et signature du destinataire enregistrées avec succès.'
+            : 'Signature du destinataire et image téléchargées avec succès.';
         Swal.fire({
             icon: 'success',
             title: 'Success',
-            text: 'Receiver signature & image uploaded successfully!',
+            text: msg,
             showConfirmButton: false,
             timer: 1500,
             timerProgressBar: true
-        });
+        }).then(function() { window.location.reload(); });
 
     } catch (error) {
         console.error(error);

@@ -53,23 +53,59 @@
                     <!-- Pickup Image Upload -->
                     <div class="upload-section">
                         <h5>{{ __('translations.televerser') }} image pour ramassage</h5>
-                        
-                        @if($waybill->pickup_image)
-                                <img src="{{ asset('storage/' . $waybill->pickup_image) }}" alt="Pickup Image" class="img-thumbnail" width="500">
-                            @else
-                                <span>No Image</span>
+                        @php
+                            $pickupImages = [];
+                            if (!empty($waybill->pickup_image)) {
+                                $rawPickup = $waybill->pickup_image;
+                                if (is_string($rawPickup) && substr(trim($rawPickup), 0, 1) === '[') {
+                                    $arrPickup = json_decode($rawPickup, true);
+                                    $pickupImages = is_array($arrPickup) ? $arrPickup : [];
+                                } else {
+                                    $pickupImages = [$rawPickup];
+                                }
+                            }
+                        @endphp
+                        @forelse($pickupImages as $img)
+                            @php
+                                $normalizedImg = $img
+                                    ? ltrim(preg_replace('~/{2,}~', '/', (string) $img), '/')
+                                    : null;
+                            @endphp
+                            @if($normalizedImg)
+                                <img src="{{ asset('storage/' . $normalizedImg) }}" alt="Pickup Image" class="img-thumbnail mr-1 mb-1" width="120" style="max-height:120px;object-fit:cover;">
                             @endif
+                        @empty
+                            <span>No Image</span>
+                        @endforelse
                     </div>
 
                     <!-- Drop Image Upload -->
                     <div class="upload-section">
-                        <!--<h5>téléverser  image pour livraison</h5>-->
                         <h5>{{ __('translations.televerser') }}  image pour livraison</h5>
-                        @if($waybill->drop_image)
-                                <img src="{{ asset('storage/' . $waybill->drop_image) }}" alt="Drop Image" class="img-thumbnail" width="500">
-                            @else
-                                <span>No Image</span>
+                        @php
+                            $dropImages = [];
+                            if (!empty($waybill->drop_image)) {
+                                $rawDrop = $waybill->drop_image;
+                                if (is_string($rawDrop) && substr(trim($rawDrop), 0, 1) === '[') {
+                                    $arrDrop = json_decode($rawDrop, true);
+                                    $dropImages = is_array($arrDrop) ? $arrDrop : [];
+                                } else {
+                                    $dropImages = [$rawDrop];
+                                }
+                            }
+                        @endphp
+                        @forelse($dropImages as $img)
+                            @php
+                                $normalizedImg = $img
+                                    ? ltrim(preg_replace('~/{2,}~', '/', (string) $img), '/')
+                                    : null;
+                            @endphp
+                            @if($normalizedImg)
+                                <img src="{{ asset('storage/' . $normalizedImg) }}" alt="Drop Image" class="img-thumbnail mr-1 mb-1" width="120" style="max-height:120px;object-fit:cover;">
                             @endif
+                        @empty
+                            <span>No Image</span>
+                        @endforelse
                     </div>
                     
                      {{-- signature note --}}

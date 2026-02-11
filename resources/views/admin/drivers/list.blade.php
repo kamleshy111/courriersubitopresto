@@ -43,19 +43,49 @@
                     <tr>
                         <td>{{ $waybill->id }}</td>
 
-                        {{-- Pickup Image Display --}}
+                        {{-- Pickup Image Display (single, first image) --}}
                         <td>
-                            @if($waybill->pickup_image)
-                                <img src="{{ asset('storage/' . $waybill->pickup_image) }}" alt="Pickup Image" class="img-thumbnail" width="100">
+                            @php
+                                $firstPickupImg = null;
+                                if (!empty($waybill->pickup_image)) {
+                                    $rawPickup = $waybill->pickup_image;
+                                    if (is_string($rawPickup) && substr(trim($rawPickup), 0, 1) === '[') {
+                                        $arrPickup = json_decode($rawPickup, true);
+                                        $firstPickupImg = is_array($arrPickup) && count($arrPickup) > 0 ? $arrPickup[0] : null;
+                                    } else {
+                                        $firstPickupImg = $rawPickup;
+                                    }
+                                }
+                                $firstPickupImg = $firstPickupImg
+                                    ? ltrim(preg_replace('~/{2,}~', '/', (string) $firstPickupImg), '/')
+                                    : null;
+                            @endphp
+                            @if($firstPickupImg)
+                                <img src="{{ asset('storage/' . $firstPickupImg) }}" alt="Pickup Image" class="img-thumbnail" width="80" style="max-height:80px;object-fit:cover;">
                             @else
                                 <span>No Image</span>
                             @endif
                         </td>
 
-                        {{-- Drop Image Display --}}
+                        {{-- Drop Image Display (single, first image) --}}
                         <td>
-                            @if($waybill->drop_image)
-                                <img src="{{ asset('storage/' . $waybill->drop_image) }}" alt="Drop Image" class="img-thumbnail" width="100">
+                            @php
+                                $firstDropImg = null;
+                                if (!empty($waybill->drop_image)) {
+                                    $rawDrop = $waybill->drop_image;
+                                    if (is_string($rawDrop) && substr(trim($rawDrop), 0, 1) === '[') {
+                                        $arrDrop = json_decode($rawDrop, true);
+                                        $firstDropImg = is_array($arrDrop) && count($arrDrop) > 0 ? $arrDrop[0] : null;
+                                    } else {
+                                        $firstDropImg = $rawDrop;
+                                    }
+                                }
+                                $firstDropImg = $firstDropImg
+                                    ? ltrim(preg_replace('~/{2,}~', '/', (string) $firstDropImg), '/')
+                                    : null;
+                            @endphp
+                            @if($firstDropImg)
+                                <img src="{{ asset('storage/' . $firstDropImg) }}" alt="Drop Image" class="img-thumbnail" width="80" style="max-height:80px;object-fit:cover;">
                             @else
                                 <span>No Image</span>
                             @endif
