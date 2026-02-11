@@ -274,6 +274,10 @@ update buttons & table field according instructions
 
     <tbody>
 
+        @php
+            $isDriver = auth()->check() && auth()->user()->roles->contains('id', 3);
+        @endphp
+
         @forelse($waybills as $waybill)
 
             <tr>
@@ -282,30 +286,29 @@ update buttons & table field according instructions
 
                 {{-- <td>{{ $waybill->shipper->prefix . str_pad($waybill->soft_id, 6, 0, STR_PAD_LEFT);}}</td> --}}
 
-                <td> {{ $waybill->shipper->name }}</td>
+                <td>
+                    @include('admin.partials.google-maps-link', [
+                        'enabled' => $isDriver,
+                        'requireAddress' => true,
+                        'text' => $waybill->shipper->name,  // display name only
+                        'name' => $waybill->shipper->name,  // query includes name + address
+                        'address' => $waybill->shipper->address,
+                        'city_name' => $waybill->shipper->city_name,
+                        'city_state' => $waybill->shipper->city_state,
+                    ])
+                </td>
 
                 {{--<td> {{ $waybill->shipper->address }}</td>--}}
                 <td>
-                @if(auth()->check() && auth()->user()->roles->contains('id', 3))
-                    @if(!empty($waybill->shipper->address))
-                        @php
-                        // Build a full address string - customize to your data model!
-                        $fullAddressShipper = trim($waybill->shipper->address . ', ' .
-                                            $waybill->shipper->city_name . ', ' .
-                                            $waybill->shipper->city_state);
-                                            // $waybill->shipper->postal_code);
-
-                        // URL-encode the full address
-                        $addressEncodedshipper = urlencode($fullAddressShipper);
-                    @endphp
-
-                    <a href="https://www.google.com/maps/search/?api=1&query={{ $addressEncodedshipper }}" target="_blank" rel="noopener noreferrer">
-                        {{ $waybill->shipper->address }}
-                    </a>
-                    @endif
-                @else
-                        {{ $waybill->shipper->address }}
-                @endif
+                    @include('admin.partials.google-maps-link', [
+                        'enabled' => $isDriver,
+                        'requireAddress' => true,
+                        'text' => $waybill->shipper->address,
+                        'name' => null,
+                        'address' => $waybill->shipper->address,
+                        'city_name' => $waybill->shipper->city_name,
+                        'city_state' => $waybill->shipper->city_state,
+                    ])
                 </td>
 
                 {{-- <td>hello</td> --}}
@@ -330,7 +333,15 @@ update buttons & table field according instructions
 
                     {{-- </form> --}}
 
-                    {{ $waybill->recipient->name }}
+                    @include('admin.partials.google-maps-link', [
+                        'enabled' => $isDriver,
+                        'requireAddress' => true,
+                        'text' => $waybill->recipient->name, // display name only
+                        'name' => $waybill->recipient->name, // query includes name + address
+                        'address' => $waybill->recipient->address,
+                        'city_name' => $waybill->recipient->city_name,
+                        'city_state' => $waybill->recipient->city_state,
+                    ])
 
                 </td>
 
@@ -352,26 +363,15 @@ update buttons & table field according instructions
 
                     {{-- {{ $waybill->recipient->address }} --}}
                     
-                     @if(auth()->check() && auth()->user()->roles->contains('id', 3))
-                        @if(!empty($waybill->recipient->address))
-                             @php
-                        // Build a full address string - customize to your data model!
-                        $fullAddressRecipient = trim($waybill->recipient->address . ', ' .
-                                            $waybill->recipient->city_name . ', ' .
-                                            $waybill->recipient->city_state); // . ', ' .
-                                            // $waybill->recipient->postal_code);
-
-                        // URL-encode the full address
-                        $addressEncodedRecipient = urlencode($fullAddressRecipient);
-                    @endphp
-
-                    <a href="https://www.google.com/maps/search/?api=1&query={{ $addressEncodedRecipient }}" target="_blank" rel="noopener noreferrer">
-                        {{ $waybill->recipient->address }}
-                    </a>
-                        @endif
-                    @else
-                        {{ $waybill->recipient->address }}
-                    @endif
+                    @include('admin.partials.google-maps-link', [
+                        'enabled' => $isDriver,
+                        'requireAddress' => true,
+                        'text' => $waybill->recipient->address,
+                        'name' => null,
+                        'address' => $waybill->recipient->address,
+                        'city_name' => $waybill->recipient->city_name,
+                        'city_state' => $waybill->recipient->city_state,
+                    ])
 
                 </td>
 
