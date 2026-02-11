@@ -1923,40 +1923,89 @@ public function uploadDropImageUpdated(Request $request, $waybillId)
 
     $waybillPosition = $positionMap[$loggedUserId] ?? null;
 
+    // Allow single file, multiple files (drop_image[]), or base64 string
+    $hasFiles = $request->hasFile('drop_image');
+    $files = $hasFiles ? $request->file('drop_image') : null;
+    if ($files && !is_array($files)) {
+        $files = [$files];
+    }
+
+    if ($files && count($files) > 5) {
+        return response()->json(['success' => false, 'message' => 'Maximum 5 images allowed.']);
+    }
+
+    if (!$hasFiles && !$request->has('drop_image')) {
+        return response()->json(['success' => false, 'message' => 'No image provided.']);
+    }
+
+    // Validation
+    if ($files) {
+        if (is_array($request->file('drop_image'))) {
+            $request->validate([
+                'drop_image' => 'array',
+                'drop_image.*' => 'image|mimes:jpeg,png,jpg,gif|max:10240',
+            ]);
+        } else {
+            $request->validate([
+                'drop_image' => 'required|file|image|mimes:jpeg,png,jpg,gif|max:10240',
+            ]);
+        }
+    } else {
+        // Base64 string
+        $request->validate([
+            'drop_image' => 'required|string',
+        ]);
+    }
+
     try {
         $path = null;
+        $paths = [];
 
-        // ✅ If base64 image is provided
-        if ($request->has('drop_image') && is_string($request->drop_image)) {
+        // ✅ Multiple files (drop_image[])
+        if ($files && count($files) > 0) {
+            foreach ($files as $file) {
+                if ($file->isValid()) {
+                    $stored = $file->store('drop_images', 'public');
+                    $stored = preg_replace('~/{2,}~', '/', (string) $stored);
+                    $stored = ltrim($stored, '/');
+                    $paths[] = $stored;
+                }
+            }
+            if (empty($paths)) {
+                return response()->json(['success' => false, 'message' => 'No valid image(s) provided.']);
+            }
+        }
+        // ✅ Single base64 image
+        elseif ($request->has('drop_image') && is_string($request->drop_image)) {
             $imageData = $request->drop_image;
-
-            // Clean and decode base64 string
             $imageData = preg_replace('/^data:image\/\w+;base64,/', '', $imageData);
             $imageData = str_replace(' ', '+', $imageData);
             $image = base64_decode($imageData);
-
             if (!$image) {
                 return response()->json(['success' => false, 'message' => 'Invalid base64 image.']);
             }
-
             $imageName = 'drop_image_' . time() . '.jpg';
             $path = 'drop_images/' . $imageName;
+            $path = preg_replace('~/{2,}~', '/', (string) $path);
+            $path = ltrim($path, '/');
             Storage::disk('public')->put($path, $image);
         }
-
-        // ✅ If file uploaded (e.g. via FormData)
+        // ✅ Single file (backward compat)
         elseif ($request->hasFile('drop_image') && $request->file('drop_image')->isValid()) {
             $file = $request->file('drop_image');
             $path = $file->store('drop_images', 'public');
-        }
-
-        else {
+            $path = preg_replace('~/{2,}~', '/', (string) $path);
+            $path = ltrim($path, '/');
+        } else {
             return response()->json(['success' => false, 'message' => 'No image provided.']);
         }
 
-        // ✅ Update database
+        // Store either a JSON array of paths or a single path
+        $dropImageValue = count($paths) > 0 ? json_encode($paths) : $path;
+
+        // ✅ Update database (behaviour unchanged except for supporting multiple images)
         Waybill::where('id', $waybillId)->update([
-            'drop_image' => $path,
+            'drop_image' => $dropImageValue,
             'drop_time' => now(),
             'dashboard_position' => $waybillPosition,
             'delivery_status' => 1,
@@ -1964,7 +2013,13 @@ public function uploadDropImageUpdated(Request $request, $waybillId)
             'popup_position' => null
         ]);
 
-        return response()->json(['success' => true, 'path' => $path]);
+        $count = count($paths) > 0 ? count($paths) : ($path ? 1 : 0);
+
+        return response()->json([
+            'success' => true,
+            'path' => count($paths) ? $paths[0] : $path,
+            'count' => $count,
+        ]);
 
     } catch (\Exception $e) {
         Log::error('Drop image upload error', [
