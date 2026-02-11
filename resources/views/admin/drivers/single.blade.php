@@ -359,8 +359,8 @@
                             <input
                                 type="file"
                                 id="drop_file_input"
+                                name="drop_image[]"
                                 accept="image/*"
-                                capture="environment"
                                 class="form-control form-control-sm mt-2"
                                 style="max-width:500px;"
                                 multiple
