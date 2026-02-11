@@ -350,17 +350,28 @@
 
 
 
- @if($waybill->drop_image)
-
-                                    {{--<div style="text-align: center;">--}}
-                                    <a href="{{ asset('storage/' . $waybill->drop_image) }}" target="_blank">
-
-                                <img src="{{ asset('storage/' . $waybill->drop_image) }}" alt="Pickup Image" class="img-thumbnail" width="100" style="display: inline; margin-left:25px;">
-                                </a>
-
-                                {{--</div>--}}
-
-                            @endif</p>
+ @php
+     $lastDropImg = null;
+     if (!empty($waybill->drop_image)) {
+         $rawDrop = $waybill->drop_image;
+         if (is_string($rawDrop) && substr(trim($rawDrop), 0, 1) === '[') {
+             $arrDrop = json_decode($rawDrop, true);
+             if (is_array($arrDrop) && count($arrDrop) > 0) {
+                 $lastDropImg = end($arrDrop); // latest image
+             }
+         } else {
+             $lastDropImg = $rawDrop;
+         }
+     }
+     $lastDropImg = $lastDropImg
+         ? ltrim(preg_replace('~/{2,}~', '/', (string) $lastDropImg), '/')
+         : null;
+ @endphp
+ @if($lastDropImg)
+     <a href="{{ asset('storage/' . $lastDropImg) }}" target="_blank">
+         <img src="{{ asset('storage/' . $lastDropImg) }}" alt="Image de réception" class="img-thumbnail" width="100" style="display:inline; margin-left:25px; max-height:120px; object-fit:cover;">
+     </a>
+ @endif</p>
 
 
 

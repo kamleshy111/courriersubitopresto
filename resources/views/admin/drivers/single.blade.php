@@ -326,9 +326,28 @@
 
                     <div class="upload-section">
                         <h5>{{__('translations.Televerser')}} l’image de {{__('translations.reception')}}</h5>
-                        @if($waybill->drop_image)
-                                <img src="{{ asset('storage/' . $waybill->drop_image) }}" alt="Drop Image" class="img-thumbnail">
+                        @php
+                            $dropImages = [];
+                            if (!empty($waybill->drop_image)) {
+                                $rawDrop = $waybill->drop_image;
+                                if (is_string($rawDrop) && substr(trim($rawDrop), 0, 1) === '[') {
+                                    $arrDrop = json_decode($rawDrop, true);
+                                    $dropImages = is_array($arrDrop) ? $arrDrop : [];
+                                } else {
+                                    $dropImages = [$rawDrop];
+                                }
+                            }
+                        @endphp
+                        @foreach($dropImages as $img)
+                            @php
+                                $normalizedImg = $img
+                                    ? ltrim(preg_replace('~/{2,}~', '/', (string) $img), '/')
+                                    : null;
+                            @endphp
+                            @if($normalizedImg)
+                                <img src="{{ asset('storage/' . $normalizedImg) }}" alt="Drop Image" class="img-thumbnail mr-1 mb-1" width="120" style="max-height:120px;object-fit:cover;">
                             @endif
+                        @endforeach
                         <div class="d-flex align-items-center gap-2 mb-2">
                             <!-- Step 1: Capture Button (Camera Icon) -->
                             {{-- <span>1.</span> --}}
@@ -337,7 +356,15 @@
                             </button>
 
                             {{--<input type="file" id="drop_file_input"  class="form-control form-control-sm mt-2" style="max-width: 500px;" /> --}}
-                            <input type="file" id="drop_file_input" accept="image/*" capture="environment" class="form-control form-control-sm mt-2" style="max-width:500px;" />
+                            <input
+                                type="file"
+                                id="drop_file_input"
+                                accept="image/*"
+                                capture="environment"
+                                class="form-control form-control-sm mt-2"
+                                style="max-width:500px;"
+                                multiple
+                            />
 
                             <!-- Step 2: Upload Button -->
                             {{-- <span class="ml-3">2.</span>
@@ -1179,7 +1206,7 @@ savePickupButton.addEventListener('click', async function () {
     const cameraSectionReceiver = document.getElementById('cameraSectionReceiver');
     const openCameraButtonReceiver = document.getElementById('openCameraButtonReceiver');
     const uploadButtonReceiver = document.getElementById('uploadButtonReceiver');
-    const imageUploadFormReceiver = document.getElementById('imageUploadForm');
+    const imageUploadFormReceiver = document.getElementById('imageUploadFormReceiver');
     const dropImagePath = document.getElementById('drop_image_path');
     const capturedImageReceiver = document.getElementById('capturedImageReceiver');
     const canvasReceiver = document.getElementById('canvasReceiver');
@@ -1251,11 +1278,17 @@ saveDropButton.addEventListener('click', async function () {
 
     const dropImageBase64 = document.getElementById('drop_image_path')?.value || ""; // 📷 Camera base64
     const dropFileInput = document.getElementById('drop_file_input'); // 📁 File input
-    const uploadedFile = dropFileInput?.files[0];
+    const uploadedFiles = dropFileInput?.files ? Array.from(dropFileInput.files).slice(0, 5) : [];
+
+    if (dropFileInput?.files?.length > 5) {
+        alert("Veuillez sélectionner au maximum 5 images.");
+        document.getElementById('overlay').style.display = 'none';
+        return;
+    }
 
     // === Validation ===
-    if (!dropImageBase64 && !uploadedFile) {
-        alert("Please capture or upload a drop image.");
+    if (!dropImageBase64 && uploadedFiles.length === 0) {
+        alert("Please capture or upload at least one drop image.");
         document.getElementById('overlay').style.display = 'none';
         return;
     }
@@ -1288,10 +1321,12 @@ saveDropButton.addEventListener('click', async function () {
         // === Submit Drop Image ===
         let imageUploadResponse;
 
-        if (uploadedFile) {
-            // 📁 File input — send using FormData
+        if (uploadedFiles.length > 0) {
+            // 📁 Up to 5 files from "Choose file"
             const formData = new FormData();
-            formData.append('drop_image', uploadedFile);
+            uploadedFiles.forEach(function(file) {
+                formData.append('drop_image[]', file);
+            });
 
             imageUploadResponse = await fetch("{{ route('admin.waybills.uploadDropImageUpdated', $waybill->id) }}", {
                 method: 'POST',
@@ -1301,7 +1336,6 @@ saveDropButton.addEventListener('click', async function () {
                 },
                 body: formData
             });
-
         } else {
             // 📷 Base64 camera image — send as JSON
             imageUploadResponse = await fetch("{{ route('admin.waybills.uploadDropImageUpdated', $waybill->id) }}", {
@@ -1324,14 +1358,18 @@ saveDropButton.addEventListener('click', async function () {
 
         // === SUCCESS ===
         document.getElementById('overlay').style.display = 'none';
+        const imgCount = (imageData && imageData.count) ? imageData.count : 1;
+        const msg = imgCount > 1
+            ? imgCount + ' images et signature du destinataire enregistrées avec succès.'
+            : 'Signature du destinataire et image téléchargées avec succès.';
         Swal.fire({
             icon: 'success',
             title: 'Success',
-            text: 'Receiver signature & image uploaded successfully!',
+            text: msg,
             showConfirmButton: false,
             timer: 1500,
             timerProgressBar: true
-        });
+        }).then(function() { window.location.reload(); });
 
     } catch (error) {
         console.error(error);
