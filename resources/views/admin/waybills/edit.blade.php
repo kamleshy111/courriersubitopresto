@@ -119,13 +119,13 @@
 
                 {!! Form::submit(is_object(@$model) ? 'Mettre à jour' : 'Sauvegarder et envoyer*')->attrs([
 
-            'class' => 'btn-primary btn-lg',
-
-        ]) !!}
+                    'class' => 'btn-primary btn-lg',
+                
+                ]) !!}
 
                 @if (!isset($model))
                     <button type="submit" id="realSubmitBtn" name="save_and_preview" value="1" class="btn btn-lg btn-info ml-2 d-none">Sauvegarder et aperçu</button>
-                    <button type="button" id="savePreviewBtn" class="btn btn-lg btn-info ml-2"> Sauvegarder et aperçu</button>
+                    <button type="button" id="savePreviewBtn" class="btn btn-lg btn-info ml-2 d-none"> Sauvegarder et aperçu</button>
                 @endif
 
             @else
