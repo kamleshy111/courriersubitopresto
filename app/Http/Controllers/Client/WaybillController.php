@@ -348,7 +348,7 @@ class WaybillController extends Controller
         // })
         ->editColumn('updated_at', function ($row) {
 
-            return $row->updated_at ? Carbon::parse($row->updated_at)->toFormattedDateString() : null;
+            return $row->updated_at ? Carbon::parse($row->updated_at)->format('M j, Y H:i') : null;
 
         })
         ->editColumn('delivery_status', function ($row) {

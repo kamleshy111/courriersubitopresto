@@ -1170,7 +1170,8 @@ public function updateApprovalStatus(Request $request)
                 // 'delivery_status' => null
                 'dashboard_soft_delete' =>1,
                 'order' => null,
-                'popup_position' => null
+                'popup_position' => null,
+                'updated_at' => now()
             ]);
         }
             else if($status == 1){
@@ -1181,7 +1182,8 @@ public function updateApprovalStatus(Request $request)
                         'driver_id' => null,
                         'delivery_status' => null,
                         'order' => null,
-                        'popup_position' => null
+                        'popup_position' => null,
+                        'updated_at' => now()
                         ]);
 
             }
@@ -2643,7 +2645,7 @@ public function adminByWaybillID(Request $request)
                 'shipper_name' => $wb->shipper->name ?? 'N/A',
                 'shipper_address' => $wb->shipper->address ?? 'N/A',
                 'date' => $wb->date ? \Carbon\Carbon::parse($wb->date)->toFormattedDateString() : null,
-                'updated_at' => $wb->updated_at ? \Carbon\Carbon::parse($wb->updated_at)->toFormattedDateString() : null,
+                'updated_at' => $wb->updated_at ? \Carbon\Carbon::parse($wb->updated_at)->format('M j, Y H:i'): null,
                 'delivery_status' => $wb->delivery_status,
                 'type' => $wb->type,
             ];
