@@ -114,15 +114,10 @@
             100% { transform: rotate(360deg); }
         }
 
+        .btn-view-box-waybill {
+            display: none !important;
+        }
     </style>
-
-    @if(Request::query('waybill') == "true")
-        <style>
-            .btn-view-box-waybill {
-                display: none !important;
-            }
-        </style>
-    @endif
     <link href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css" rel="stylesheet">
     <link href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css" rel="stylesheet">
 
@@ -503,7 +498,8 @@
                     processing   : true,
                     serverSide   : true,
                     responsive   : true,
-                    sorting      : false,
+                    order: [[4, 'desc']],
+                    ordering     : true,
                     lengthChange : true,
                     autoWidth    : false,
                     pageLength   : 5,
@@ -665,7 +661,7 @@
                             "data" : "date"
 
                         },
-                        
+
                         { data: 'updated_at'},
 
 
@@ -1157,7 +1153,8 @@ function updateApprovalStatus1(waybillId, status) {
                     processing   : true,
                     serverSide   : true,
                     responsive   : true,
-                    sorting      : false,
+                    order: [[4, 'desc']],
+                    ordering     : true,
                     lengthChange : true,
                     autoWidth    : false,
                     pageLength   : 5,
@@ -1186,7 +1183,8 @@ function updateApprovalStatus1(waybillId, status) {
                     processing   : true,
                     serverSide   : true,
                     responsive   : true,
-                    sorting      : false,
+                    order: [[5, 'desc']],
+                    ordering     : true,
                     lengthChange : true,
                     autoWidth    : false,
                     pageLength   : 7,

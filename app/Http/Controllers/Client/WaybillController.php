@@ -39,7 +39,7 @@ class WaybillController extends Controller
 
         $result = Waybill::with('recipient','user.client')
 
-            ->where('user_id', \Auth::id())
+            ->where('waybills.user_id', \Auth::id())
 
             ->where('type', $type)
 
@@ -51,7 +51,7 @@ class WaybillController extends Controller
 })
 
 
-            ->orderByDesc('date');
+            ->withoutTrashed();
 
         return datatables( $result)
 
@@ -542,8 +542,7 @@ class WaybillController extends Controller
                 ->whereIn('submission_status', [0,1])
                 // ->where('submission_status', [0,1])
 
-                ->orderByDesc('date');
-
+                ->withoutTrashed();
 
 
 
@@ -710,14 +709,14 @@ class WaybillController extends Controller
 
             $result = Waybill::with('recipient','user.client')
 
-                ->where('user_id', \Auth::id())
+                ->where('waybills.user_id', \Auth::id())
 
                 // ->whereIn('submission_status', [0,1])
                 // old working good
                 // ->where('submission_status', 3)
                 ->where('submission_status', 1)
 
-                ->orderByDesc('date');
+                ->withoutTrashed();
 
 
 
