@@ -238,6 +238,7 @@
                             {{-- <th style="width: 13%; text-align: center!important;">Statut</th>--}}
                             <th style="width: 13%; text-align: center!important;">Statut de livraison</th>
                             <th style="width: 13%; text-align: center!important;">Date</th>
+                            <th style="width: 13%; text-align: center!important;">Date de création</th>
                             @if(Request::query('waybill') == "false" || Request::query('archive') == "true")
                                 <th>Prix</th>
                             @endif
@@ -531,6 +532,7 @@
                         {
                             "data" : "date"
                         },
+                        { data: 'updated_at'},
                             @if(Request::query('waybill') == "false")
                         { data: 'price' },
                             @endif
@@ -1169,6 +1171,7 @@ function updateApprovalStatus1(waybillId, status) {
                         // {"data" : "status"},
                         {"data" : "delivery_status"},
                         {"data" : "date"},
+                        { data: 'updated_at' },
                         { data: 'price' },
                         {"data" : 'action', "orderable": false, "searchable": false}
                     ],
@@ -1223,7 +1226,7 @@ function updateApprovalStatus1(waybillId, status) {
                             "data" : "submission_approval_date"
                         },
                         {
-                            "data" : "created_at"
+                            "data" : "updated_at"
                         },
                         { data: 'price' },
 

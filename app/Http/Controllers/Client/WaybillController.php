@@ -67,6 +67,12 @@ class WaybillController extends Controller
 
             })
 
+            ->editColumn('updated_at', function ($row) {
+
+                return $row->updated_at ? Carbon::parse($row->updated_at)->format('M j, Y H:i') : null;
+
+            })
+
             ->editColumn('status', function($row)
 
             {
@@ -603,13 +609,13 @@ class WaybillController extends Controller
 
                 })
 
-                ->editColumn('created_at', function($row)
+                ->editColumn('updated_at', function($row)
 
                 {
 
-                    if($row->created_at != null){
+                    if($row->updated_at != null){
 
-                        return Carbon::parse($row->created_at)->toFormattedDateString();
+                        return Carbon::parse($row->updated_at)->toFormattedDateString();
 
                     }
 
@@ -833,6 +839,18 @@ class WaybillController extends Controller
                     if($row->user->client != null){
 
                         return $row->user->client->prefix . str_pad($row->soft_id, 6, 0, STR_PAD_LEFT);
+
+                    }
+
+                })
+
+                ->editColumn('updated_at', function($row)
+
+                {
+
+                    if($row->updated_at != null){
+
+                        return Carbon::parse($row->updated_at)->toFormattedDateString();
 
                     }
 
