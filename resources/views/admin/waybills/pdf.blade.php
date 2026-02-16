@@ -240,7 +240,7 @@
 {{--                                                    $setting = \App\Models\Setting::where('user_id', $user_id)->first();--}}
 {{--                                                @endphp--}}
                                                 <td style="border: 0.5mm solid black;" width="25%">
-                                                    @if($price != null)
+                                                    @if($price != null && (auth()->user()->hasRole('admin') || $submission_status != '1'))
                                                         {{ $price }}
                                                     @endif
                                                 </td>
