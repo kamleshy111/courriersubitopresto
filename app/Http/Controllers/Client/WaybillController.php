@@ -613,11 +613,7 @@ class WaybillController extends Controller
 
                 {
 
-                    if($row->updated_at != null){
-
-                        return Carbon::parse($row->updated_at)->toFormattedDateString();
-
-                    }
+                    return $row->updated_at ? Carbon::parse($row->updated_at)->format('M j, Y H:i') : null;
 
                 })
 
@@ -848,11 +844,7 @@ class WaybillController extends Controller
 
                 {
 
-                    if($row->updated_at != null){
-
-                        return Carbon::parse($row->updated_at)->toFormattedDateString();
-
-                    }
+                    return $row->updated_at ? Carbon::parse($row->updated_at)->format('M j, Y H:i') : null;
 
                 })
 
