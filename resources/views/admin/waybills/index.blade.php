@@ -114,15 +114,10 @@
             100% { transform: rotate(360deg); }
         }
 
+        .btn-view-box-waybill {
+            display: none !important;
+        }
     </style>
-
-    @if(Request::query('waybill') == "true")
-        <style>
-            .btn-view-box-waybill {
-                display: none !important;
-            }
-        </style>
-    @endif
     <link href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css" rel="stylesheet">
     <link href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css" rel="stylesheet">
 
@@ -243,6 +238,7 @@
                             {{-- <th style="width: 13%; text-align: center!important;">Statut</th>--}}
                             <th style="width: 13%; text-align: center!important;">Statut de livraison</th>
                             <th style="width: 13%; text-align: center!important;">Date</th>
+                            <th style="width: 13%; text-align: center!important;">Date de création</th>
                             @if(Request::query('waybill') == "false" || Request::query('archive') == "true")
                                 <th>Prix</th>
                             @endif
@@ -503,7 +499,8 @@
                     processing   : true,
                     serverSide   : true,
                     responsive   : true,
-                    sorting      : false,
+                    order: [[4, 'desc']],
+                    ordering     : true,
                     lengthChange : true,
                     autoWidth    : false,
                     pageLength   : 5,
@@ -535,6 +532,7 @@
                         {
                             "data" : "date"
                         },
+                        { data: 'updated_at'},
                             @if(Request::query('waybill') == "false")
                         { data: 'price' },
                             @endif
@@ -665,7 +663,7 @@
                             "data" : "date"
 
                         },
-                        
+
                         { data: 'updated_at'},
 
 
@@ -1157,7 +1155,8 @@ function updateApprovalStatus1(waybillId, status) {
                     processing   : true,
                     serverSide   : true,
                     responsive   : true,
-                    sorting      : false,
+                    order: [[4, 'desc']],
+                    ordering     : true,
                     lengthChange : true,
                     autoWidth    : false,
                     pageLength   : 5,
@@ -1172,6 +1171,7 @@ function updateApprovalStatus1(waybillId, status) {
                         // {"data" : "status"},
                         {"data" : "delivery_status"},
                         {"data" : "date"},
+                        { data: 'updated_at' },
                         { data: 'price' },
                         {"data" : 'action', "orderable": false, "searchable": false}
                     ],
@@ -1186,7 +1186,8 @@ function updateApprovalStatus1(waybillId, status) {
                     processing   : true,
                     serverSide   : true,
                     responsive   : true,
-                    sorting      : false,
+                    order: [[5, 'desc']],
+                    ordering     : true,
                     lengthChange : true,
                     autoWidth    : false,
                     pageLength   : 7,
@@ -1225,7 +1226,7 @@ function updateApprovalStatus1(waybillId, status) {
                             "data" : "submission_approval_date"
                         },
                         {
-                            "data" : "created_at"
+                            "data" : "updated_at"
                         },
                         { data: 'price' },
 

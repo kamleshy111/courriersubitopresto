@@ -39,7 +39,7 @@ class WaybillController extends Controller
 
         $result = Waybill::with('recipient','user.client')
 
-            ->where('user_id', \Auth::id())
+            ->where('waybills.user_id', \Auth::id())
 
             ->where('type', $type)
 
@@ -51,7 +51,7 @@ class WaybillController extends Controller
 })
 
 
-            ->orderByDesc('date');
+            ->withoutTrashed();
 
         return datatables( $result)
 
@@ -64,6 +64,12 @@ class WaybillController extends Controller
                     return Carbon::parse($row->date)->toFormattedDateString();
 
                 }
+
+            })
+
+            ->editColumn('updated_at', function ($row) {
+
+                return $row->updated_at ? Carbon::parse($row->updated_at)->format('M j, Y H:i') : null;
 
             })
 
@@ -542,8 +548,7 @@ class WaybillController extends Controller
                 ->whereIn('submission_status', [0,1])
                 // ->where('submission_status', [0,1])
 
-                ->orderByDesc('date');
-
+                ->withoutTrashed();
 
 
 
@@ -604,15 +609,11 @@ class WaybillController extends Controller
 
                 })
 
-                ->editColumn('created_at', function($row)
+                ->editColumn('updated_at', function($row)
 
                 {
 
-                    if($row->created_at != null){
-
-                        return Carbon::parse($row->created_at)->toFormattedDateString();
-
-                    }
+                    return $row->updated_at ? Carbon::parse($row->updated_at)->format('M j, Y H:i') : null;
 
                 })
 
@@ -710,14 +711,14 @@ class WaybillController extends Controller
 
             $result = Waybill::with('recipient','user.client')
 
-                ->where('user_id', \Auth::id())
+                ->where('waybills.user_id', \Auth::id())
 
                 // ->whereIn('submission_status', [0,1])
                 // old working good
                 // ->where('submission_status', 3)
                 ->where('submission_status', 1)
 
-                ->orderByDesc('date');
+                ->withoutTrashed();
 
 
 
@@ -836,6 +837,14 @@ class WaybillController extends Controller
                         return $row->user->client->prefix . str_pad($row->soft_id, 6, 0, STR_PAD_LEFT);
 
                     }
+
+                })
+
+                ->editColumn('updated_at', function($row)
+
+                {
+
+                    return $row->updated_at ? Carbon::parse($row->updated_at)->format('M j, Y H:i') : null;
 
                 })
 
