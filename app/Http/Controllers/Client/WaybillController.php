@@ -50,12 +50,12 @@ class WaybillController extends Controller
     });
 })
 
- ->selectRaw("
+->selectRaw("
         waybills.*,
         CASE
-            WHEN submission_approval_date IS NOT NULL
-            THEN submission_approval_date
-            ELSE created_at
+            WHEN waybills.submission_approval_date IS NOT NULL
+            THEN waybills.submission_approval_date
+            ELSE waybills.created_at
         END as sort_date
     ")
 
@@ -318,9 +318,9 @@ class WaybillController extends Controller
                  ->selectRaw("
         waybills.*,
         CASE
-            WHEN submission_approval_date IS NOT NULL
-            THEN submission_approval_date
-            ELSE created_at
+            WHEN waybills.submission_approval_date IS NOT NULL
+            THEN waybills.submission_approval_date
+            ELSE waybills.created_at
         END as sort_date
     ")
                 ->withoutTrashed();
@@ -360,7 +360,7 @@ class WaybillController extends Controller
         ->orderColumn('recipient.address', 'clients.address $1')
         ->orderColumn('delivery_status', 'waybills.delivery_status $1')
         ->orderColumn('date', 'waybills.date $1')
-        ->orderColumn('updated_at', 'waybills.updated_at $1')
+        // ->orderColumn('updated_at', 'waybills.updated_at $1')
         ->editColumn('date', function ($row) {
 
             // Format the date column
@@ -571,12 +571,12 @@ class WaybillController extends Controller
                 ->whereIn('submission_status', [0,1])
                 // ->where('submission_status', [0,1])
 
-                                 ->selectRaw("
+                                ->selectRaw("
         waybills.*,
         CASE
-            WHEN submission_approval_date IS NOT NULL
-            THEN submission_approval_date
-            ELSE created_at
+            WHEN waybills.submission_approval_date IS NOT NULL
+            THEN waybills.submission_approval_date
+            ELSE waybills.created_at
         END as sort_date
     ")
 
@@ -750,12 +750,12 @@ class WaybillController extends Controller
                 // ->where('submission_status', 3)
                 ->where('submission_status', 1)
 
-                                 ->selectRaw("
+                                ->selectRaw("
         waybills.*,
         CASE
-            WHEN submission_approval_date IS NOT NULL
-            THEN submission_approval_date
-            ELSE created_at
+            WHEN waybills.submission_approval_date IS NOT NULL
+            THEN waybills.submission_approval_date
+            ELSE waybills.created_at
         END as sort_date
     ")
 
