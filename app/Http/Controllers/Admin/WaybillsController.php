@@ -826,8 +826,7 @@ class WaybillsController extends CRUDController {
                 'submission_status' => 1,
                 'type'             => 0,
                 // 'submission_approval_date' => date('Y-m-d')
-                'submission_approval_date' => now()->toDateString(),  // ✔ correct for DATE
-                // 'date' => now()->toDateString(),  // ✔ correct for DATE
+                'submission_approval_date' => now() //->toDateString(),
 
             ]);
             EmailWaybillQueue::create([

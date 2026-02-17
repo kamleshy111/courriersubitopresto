@@ -50,6 +50,14 @@ class WaybillController extends Controller
     });
 })
 
+ ->selectRaw("
+        waybills.*,
+        CASE
+            WHEN submission_approval_date IS NOT NULL
+            THEN submission_approval_date
+            ELSE created_at
+        END as sort_date
+    ")
 
             ->withoutTrashed();
 
@@ -67,11 +75,17 @@ class WaybillController extends Controller
 
             })
 
-            ->editColumn('updated_at', function ($row) {
+            ->editColumn('sort_date', function ($row) {
 
-                return $row->updated_at ? Carbon::parse($row->updated_at)->format('M j, Y H:i') : null;
+                return $row->sort_date ? Carbon::parse($row->sort_date)->format('M j, Y H:i') : null;
 
             })
+
+            // ->editColumn('created_at', function ($row) {
+
+            //     return $row->created_at ? Carbon::parse($row->created_at)->format('M j, Y H:i') : null;
+
+            // })
 
             ->editColumn('status', function($row)
 
@@ -300,6 +314,15 @@ class WaybillController extends Controller
 
             $waybills = Waybill::with('recipient','shipper')
                 ->where('type', $type)
+
+                 ->selectRaw("
+        waybills.*,
+        CASE
+            WHEN submission_approval_date IS NOT NULL
+            THEN submission_approval_date
+            ELSE created_at
+        END as sort_date
+    ")
                 ->withoutTrashed();
 
             // Filter by date type (1 = today, 2 = this week)
@@ -548,6 +571,15 @@ class WaybillController extends Controller
                 ->whereIn('submission_status', [0,1])
                 // ->where('submission_status', [0,1])
 
+                                 ->selectRaw("
+        waybills.*,
+        CASE
+            WHEN submission_approval_date IS NOT NULL
+            THEN submission_approval_date
+            ELSE created_at
+        END as sort_date
+    ")
+
                 ->withoutTrashed();
 
 
@@ -718,6 +750,15 @@ class WaybillController extends Controller
                 // ->where('submission_status', 3)
                 ->where('submission_status', 1)
 
+                                 ->selectRaw("
+        waybills.*,
+        CASE
+            WHEN submission_approval_date IS NOT NULL
+            THEN submission_approval_date
+            ELSE created_at
+        END as sort_date
+    ")
+
                 ->withoutTrashed();
 
 
@@ -840,11 +881,11 @@ class WaybillController extends Controller
 
                 })
 
-                ->editColumn('updated_at', function($row)
+                ->editColumn('submission_approval_date', function($row)
 
                 {
 
-                    return $row->updated_at ? Carbon::parse($row->updated_at)->format('M j, Y H:i') : null;
+                    return $row->submission_approval_date ? Carbon::parse($row->submission_approval_date)->toFormattedDateString() : null;
 
                 })
 
