@@ -1170,7 +1170,7 @@ public function updateApprovalStatus(Request $request)
                 'dashboard_soft_delete' =>1,
                 'order' => null,
                 'popup_position' => null,
-                'updated_at' => now()
+                'submission_approval_date' => now()
             ]);
         }
             else if($status == 1){
@@ -1182,7 +1182,7 @@ public function updateApprovalStatus(Request $request)
                         'delivery_status' => null,
                         'order' => null,
                         'popup_position' => null,
-                        'updated_at' => now()
+                        'submission_approval_date' => now()
                         ]);
 
             }

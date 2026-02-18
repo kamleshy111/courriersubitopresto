@@ -1171,7 +1171,7 @@ function updateApprovalStatus1(waybillId, status) {
                         // {"data" : "status"},
                         {"data" : "delivery_status"},
                         {"data" : "date"},
-                        { data: 'submission_approval_date' },
+                        { data: 'created_at' },
                         { data: 'price' },
                         {"data" : 'action', "orderable": false, "searchable": false}
                     ],
@@ -1222,11 +1222,11 @@ function updateApprovalStatus1(waybillId, status) {
                             "data" : "delivery_status"
                         },
                         {
-                            // "data" : "date"
-                            "data" : "submission_approval_date"
+                            "data" : "date"
+                            // "data" : "submission_approval_date"
                         },
                         {
-                            "data" : "updated_at"
+                            "data" : "created_at"
                         },
                         { data: 'price' },
 
