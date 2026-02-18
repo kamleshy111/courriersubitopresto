@@ -499,7 +499,7 @@
                     processing   : true,
                     serverSide   : true,
                     responsive   : true,
-                    order: [[4, 'desc']],
+                    order: [[5, 'desc']],
                     ordering     : true,
                     lengthChange : true,
                     autoWidth    : false,
@@ -532,7 +532,7 @@
                         {
                             "data" : "date"
                         },
-                        { data: 'updated_at'},
+                        { data: "sort_date" },
                             @if(Request::query('waybill') == "false")
                         { data: 'price' },
                             @endif
@@ -664,7 +664,7 @@
 
                         },
 
-                        { data: 'updated_at'},
+                        { data: 'sort_date'},
 
 
                         @if(Request::query('waybill') == "false")
@@ -1155,7 +1155,7 @@ function updateApprovalStatus1(waybillId, status) {
                     processing   : true,
                     serverSide   : true,
                     responsive   : true,
-                    order: [[4, 'desc']],
+                    order: [[5, 'desc']],
                     ordering     : true,
                     lengthChange : true,
                     autoWidth    : false,
@@ -1171,7 +1171,7 @@ function updateApprovalStatus1(waybillId, status) {
                         // {"data" : "status"},
                         {"data" : "delivery_status"},
                         {"data" : "date"},
-                        { data: 'updated_at' },
+                        { data: 'created_at' },
                         { data: 'price' },
                         {"data" : 'action', "orderable": false, "searchable": false}
                     ],
@@ -1222,11 +1222,11 @@ function updateApprovalStatus1(waybillId, status) {
                             "data" : "delivery_status"
                         },
                         {
-                            // "data" : "date"
-                            "data" : "submission_approval_date"
+                            "data" : "date"
+                            // "data" : "submission_approval_date"
                         },
                         {
-                            "data" : "updated_at"
+                            "data" : "created_at"
                         },
                         { data: 'price' },
 
