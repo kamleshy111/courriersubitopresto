@@ -167,11 +167,13 @@ class WaybillController extends Controller
 
             ->editColumn('soft_id', function ($row){
 
-                if($row->user->client != null){
+                if($row->user && $row->user->client != null){
 
                     return $row->user->client->prefix . str_pad($row->soft_id, 6, 0, STR_PAD_LEFT);
 
                 }
+
+                return ''; // Return empty string if user or client is null
 
             })
 
@@ -298,7 +300,7 @@ class WaybillController extends Controller
 
 
 
-            $waybills = Waybill::with('recipient','shipper')
+            $waybills = Waybill::with('recipient','shipper','user.client')
                 ->where('type', $type)
                 ->withoutTrashed();
 
@@ -651,11 +653,13 @@ class WaybillController extends Controller
 
                 ->editColumn('soft_id', function ($row){
 
-                    if($row->user->client != null){
+                    if($row->user && $row->user->client != null){
 
                         return $row->user->client->prefix . str_pad($row->soft_id, 6, 0, STR_PAD_LEFT);
 
                     }
+
+                    return ''; // Return empty string if user or client is null
 
                 })
 
@@ -832,11 +836,13 @@ class WaybillController extends Controller
 
                 ->editColumn('soft_id', function ($row){
 
-                    if($row->user->client != null){
+                    if($row->user && $row->user->client != null){
 
                         return $row->user->client->prefix . str_pad($row->soft_id, 6, 0, STR_PAD_LEFT);
 
                     }
+
+                    return ''; // Return empty string if user or client is null
 
                 })
 
