@@ -57,7 +57,7 @@ class WaybillController extends Controller
                     CASE
                         WHEN waybills.submission_approval_date IS NOT NULL
                         THEN waybills.submission_approval_date
-                        ELSE waybills.$sortFallback
+                        ELSE waybills.created_at
                     END as sort_date
                 ")
 
@@ -322,7 +322,7 @@ class WaybillController extends Controller
                     CASE
                         WHEN waybills.submission_approval_date IS NOT NULL
                         THEN waybills.submission_approval_date
-                        ELSE waybills.$sortFallback
+                        ELSE waybills.created_at
                     END as sort_date
                 ")
                 ->withoutTrashed();
