@@ -48,7 +48,8 @@ class SendWaybillEmailsCommand extends Command
         {
             if($emailRequest->pdf_type == 1)
             {
-                $waybill = Waybill::with('user.client', 'shipper', 'recipient', 'shipper.city', 'recipient.city')
+                $waybill = Waybill::withTrashed()
+                    ->with('user.client', 'shipper', 'recipient', 'shipper.city', 'recipient.city')
                     ->findOrFail($emailRequest->pdf_ids);
                 Log::info($waybill);
                 $pdf = $this->pdf($waybill,false,1, true);
