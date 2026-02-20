@@ -57,7 +57,7 @@ class WaybillController extends Controller
                     CASE
                         WHEN waybills.submission_approval_date IS NOT NULL
                         THEN waybills.submission_approval_date
-                        ELSE waybills.$sortFallback
+                        ELSE waybills.created_at
                     END as sort_date
                 ")
 
@@ -183,11 +183,13 @@ class WaybillController extends Controller
 
             ->editColumn('soft_id', function ($row){
 
-                if($row->user->client != null){
+                if($row->user && $row->user->client != null){
 
                     return $row->user->client->prefix . str_pad($row->soft_id, 6, 0, STR_PAD_LEFT);
 
                 }
+
+                return ''; // Return empty string if user or client is null
 
             })
 
@@ -314,7 +316,7 @@ class WaybillController extends Controller
 
             $sortFallback = ($request->query('waybill-type') == "false") ? 'created_at' : 'updated_at';
 
-            $waybills = Waybill::with('recipient','shipper')
+            $waybills = Waybill::with('recipient','shipper','user.client')
                 ->where('type', $type)
 
                 ->selectRaw("
@@ -322,7 +324,7 @@ class WaybillController extends Controller
                     CASE
                         WHEN waybills.submission_approval_date IS NOT NULL
                         THEN waybills.submission_approval_date
-                        ELSE waybills.$sortFallback
+                        ELSE waybills.created_at
                     END as sort_date
                 ")
                 ->withoutTrashed();
@@ -676,11 +678,13 @@ class WaybillController extends Controller
 
                 ->editColumn('soft_id', function ($row){
 
-                    if($row->user->client != null){
+                    if($row->user && $row->user->client != null){
 
                         return $row->user->client->prefix . str_pad($row->soft_id, 6, 0, STR_PAD_LEFT);
 
                     }
+
+                    return ''; // Return empty string if user or client is null
 
                 })
 
@@ -857,11 +861,13 @@ class WaybillController extends Controller
 
                 ->editColumn('soft_id', function ($row){
 
-                    if($row->user->client != null){
+                    if($row->user && $row->user->client != null){
 
                         return $row->user->client->prefix . str_pad($row->soft_id, 6, 0, STR_PAD_LEFT);
 
                     }
+
+                    return ''; // Return empty string if user or client is null
 
                 })
 
