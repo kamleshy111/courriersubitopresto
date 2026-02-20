@@ -503,7 +503,7 @@
                     ordering     : true,
                     lengthChange : true,
                     autoWidth    : false,
-                    pageLength   : 5,
+                    pageLength   : 10,
                     searching    : true,
                     dom:'lBfrtip',
 
@@ -610,7 +610,7 @@
                     ordering     : true,
                     lengthChange : true,
                     autoWidth    : false,
-                    pageLength   : 7,
+                    pageLength   : 10,
                     searching    : true,
                     dom:'lBfrtip',
                     "ajax" : {
@@ -1159,7 +1159,7 @@ function updateApprovalStatus1(waybillId, status) {
                     ordering     : true,
                     lengthChange : true,
                     autoWidth    : false,
-                    pageLength   : 5,
+                    pageLength   : 10,
                     searching    : true,
                     dom:'lBfrtip',
 
@@ -1190,7 +1190,7 @@ function updateApprovalStatus1(waybillId, status) {
                     ordering     : true,
                     lengthChange : true,
                     autoWidth    : false,
-                    pageLength   : 7,
+                    pageLength   : 10,
                     searching    : true,
                     dom:'lBfrtip',
                     "ajax" : {
