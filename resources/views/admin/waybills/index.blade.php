@@ -532,7 +532,7 @@
                         {
                             "data" : "date"
                         },
-                        { data: "sort_date" },
+                        { data: "sort_date", "searchable": false },
                             @if(Request::query('waybill') == "false")
                         { data: 'price' },
                             @endif
@@ -664,7 +664,7 @@
 
                         },
 
-                        { data: 'sort_date'},
+                        { data: 'sort_date', "searchable": false},
 
 
                         @if(Request::query('waybill') == "false")
