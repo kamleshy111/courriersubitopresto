@@ -14,7 +14,7 @@ use App\Models\Waybill;
 use App\Models\Client;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
 
@@ -64,6 +64,19 @@ class WaybillController extends Controller
             ->withoutTrashed();
 
         return datatables( $result)
+            ->filterColumn('soft_id', function($query, $keyword) {
+                $query->where('waybills.soft_id', 'like', "%{$keyword}%")
+                ->orWhereExists(function ($q) use ($keyword) {
+                    $q->select(DB::raw(1))
+                    ->from('users')
+                    ->join('clients', 'users.client_id', '=', 'clients.id')
+                    ->whereColumn('users.id', 'waybills.user_id')
+                    ->whereRaw("
+                            CONCAT(clients.prefix, LPAD(waybills.soft_id, 6, '0'))
+                            LIKE ?
+                    ", ["%{$keyword}%"]);
+                });
+            })
 
             ->editColumn('date', function($row)
 
@@ -359,6 +372,19 @@ class WaybillController extends Controller
     // Process data for DataTables
 
     return datatables($waybills)
+        ->filterColumn('soft_id', function($query, $keyword) {
+            $query->where('waybills.soft_id', 'like', "%{$keyword}%")
+            ->orWhereExists(function ($q) use ($keyword) {
+                $q->select(DB::raw(1))
+                ->from('users')
+                ->join('clients', 'users.client_id', '=', 'clients.id')
+                ->whereColumn('users.id', 'waybills.user_id')
+                ->whereRaw("
+                        CONCAT(clients.prefix, LPAD(waybills.soft_id, 6, '0'))
+                        LIKE ?
+                ", ["%{$keyword}%"]);
+            });
+        })
         ->orderColumn('soft_id', 'waybills.soft_id $1')
         ->orderColumn('recipient.name', 'clients.name $1')
         ->orderColumn('recipient.address', 'clients.address $1')
@@ -624,6 +650,20 @@ class WaybillController extends Controller
 
             return datatables( $waybills)
 
+                ->filterColumn('soft_id', function($query, $keyword) {
+                    $query->where('waybills.soft_id', 'like', "%{$keyword}%")
+                    ->orWhereExists(function ($q) use ($keyword) {
+                        $q->select(DB::raw(1))
+                        ->from('users')
+                        ->join('clients', 'users.client_id', '=', 'clients.id')
+                        ->whereColumn('users.id', 'waybills.user_id')
+                        ->whereRaw("
+                                CONCAT(clients.prefix, LPAD(waybills.soft_id, 6, '0'))
+                                LIKE ?
+                        ", ["%{$keyword}%"]);
+                    });
+                })
+
                 ->editColumn('date', function($row)
 
                 {
@@ -754,6 +794,20 @@ class WaybillController extends Controller
 
 
             return datatables( $result)
+
+                ->filterColumn('soft_id', function($query, $keyword) {
+                    $query->where('waybills.soft_id', 'like', "%{$keyword}%")
+                    ->orWhereExists(function ($q) use ($keyword) {
+                        $q->select(DB::raw(1))
+                        ->from('users')
+                        ->join('clients', 'users.client_id', '=', 'clients.id')
+                        ->whereColumn('users.id', 'waybills.user_id')
+                        ->whereRaw("
+                                CONCAT(clients.prefix, LPAD(waybills.soft_id, 6, '0'))
+                                LIKE ?
+                        ", ["%{$keyword}%"]);
+                    });
+                })
 
                 ->editColumn('date', function($row)
 
