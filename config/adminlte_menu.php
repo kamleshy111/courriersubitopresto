@@ -258,7 +258,7 @@ return [
 
     [
         'text'       => 'Votre compte',
-        'route'      => 'admin.profile.index',
+        'route'      => 'admin.account.index',
         'icon'       => 'fas fa-fw fa-user',
         'can'        => 'admin.permissions.index',
 //        'classes'    => 'bold-text',
