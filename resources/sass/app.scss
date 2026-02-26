@@ -21,3 +21,18 @@ fieldset {
     padding: 1rem !important;
     margin-top: 10px;
 }
+.nav-icon.far.fa-fw.fa-circle {
+    display: none;
+  }
+
+  [class*="sidebar-dark-"] {
+    background-color: #f4f6f9;
+  }
+  .nav-pills .nav-link.active, .nav-pills .show > .nav-link {
+    color: #fff;
+    background-color: #f4f6f9;
+  }
+
+  [class*="sidebar-dark-"] .sidebar a {
+    color: #000;
+  }
