@@ -33,9 +33,16 @@
 
     @include('admin.'.$name.'.form')
 
+@php
+    $auth = auth()->user();
+    $canEdit = $auth && (
+        $auth->hasRole('admin')
+        || ($name === 'users' && isset($model) && $model->id === $auth->id)
+        || ($name === 'clients' && isset($model) && $model->user_id === $auth->id)
+    );
+@endphp
 
-
-    @if(\Laratrust::hasRole('admin'))
+    @if($canEdit)
     <div class="text-center my-3">
         {!! Form::submit((is_object(@$model) ? 'Mettre à jour' : 'Sauvegarder'))->attrs(['class' => 'btn-primary btn-lg']) !!}
     </div>
@@ -207,8 +214,8 @@
 
 
 
-            {{-- ADMIN ONLY: PDF UPLOAD FORM --}}
-            @if($isAdmin)
+            {{-- ADMIN + CLIENT: PDF UPLOAD FORM FOR THEIR OWN RECORD --}}
+            @if($isAdmin || ($isClient && ($name === 'clients' && isset($model) && $model->user_id === $auth->id)))
                 <form id="clientPdfForm" method="post" enctype="multipart/form-data" class="mt-4">
                     @csrf
                     <input type="hidden" id="client_id" name="client_id" value="{{ $model->id }}">
@@ -223,11 +230,6 @@
                         Upload PDF
                     </button>
                 </form>
-            @endif
-
-            {{-- CLIENT ROLE: No upload --}}
-            @if($isClient)
-                <!--<p class="text-muted mt-2">You do not have permission to upload PDFs.</p>-->
             @endif
 
         </div>
