@@ -37,7 +37,6 @@
     $auth = auth()->user();
     $canEdit = $auth && (
         $auth->hasRole('admin')
-        || ($name === 'users' && isset($model) && $model->id === $auth->id)
         || ($name === 'clients' && isset($model) && $model->user_id === $auth->id)
     );
 @endphp
