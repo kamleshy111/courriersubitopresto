@@ -188,7 +188,7 @@ $Driver_64 =  getDriverInfo($drivers,64);
                 <th rowspan="2">Arnaud 51 <br> (514) 880-9690 <br> 22pieds </th>
                 <th rowspan="2">Achraf 55 <br>(438) 467-7732 <br> 20 pieds tailgate</th>
                 <th rowspan="3">Sylvain 64<br>(438) 334-9216<br>20 pieds tailgate</th>--}}
-                
+
                 <th rowspan="2" id="guest"> {{$guestDriver['name']}} <br> {{ $guestDriver['phone'] }} <br>12 pieds </th>
                 <th rowspan="2">{{$Driver_10['name']}} <br> {{$Driver_10['phone']}} <br>20 pieds tailgate </th>
                 <th rowspan="2">{{$Driver_27['name']}} <br> {{$Driver_27['phone']}} <br>26 pieds Tailgate</th>
@@ -5493,6 +5493,10 @@ function saveNewPopupOrder() {
 
         // For each target td, find div[data-id] and extract the value
         targetTds.forEach(td => {
+
+            if (td.id === "cell50") {
+                return; // skip this cell id
+            }
 
             const divs = td.querySelectorAll('div[data-id]');
             divs.forEach(div => {

@@ -36,3 +36,13 @@ fieldset {
   [class*="sidebar-dark-"] .sidebar a {
     color: #000;
   }
+
+.sidebar-dark-primary .nav-sidebar > .nav-item > .nav-link.active, .sidebar-light-primary .nav-sidebar > .nav-item > .nav-link.active
+  {
+    background-color: #f5f6f9;
+    color: #212529;
+  }
+
+  .nav-link i.far.fa-fw {
+    display: none;
+  }
