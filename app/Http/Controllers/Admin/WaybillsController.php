@@ -1736,31 +1736,101 @@ public function uploadPickupImageUpdated(Request $request, $waybillId)
         if ($files && count($files) > 0) {
             foreach ($files as $file) {
                 if ($file->isValid()) {
-                    $stored = $file->store('pickup_images', 'public');
-                    // normalize any accidental double slashes
-                    $stored = preg_replace('~/{2,}~', '/', (string) $stored);
-                    $stored = ltrim($stored, '/');
-                    $paths[] = $stored;
+
+                    $imageInfo = getimagesize($file);
+                    $mime = $imageInfo['mime'];
+
+                    switch ($mime) {
+                        case 'image/jpeg':
+                            $source = imagecreatefromjpeg($file);
+                            break;
+                        case 'image/png':
+                            $source = imagecreatefrompng($file);
+                            break;
+                        case 'image/gif':
+                            $source = imagecreatefromgif($file);
+                            break;
+                        default:
+                            continue 2;
+                    }
+
+                    $width = imagesx($source);
+                    $height = imagesy($source);
+
+                    $newWidth = 200;
+                    $newHeight = floor($height * ($newWidth / $width));
+
+                    $compressed = imagecreatetruecolor($newWidth, $newHeight);
+                    imagecopyresampled($compressed, $source, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
+
+                    $imageName = 'pickup_' . time() . '_' . uniqid() . '.jpg';
+                    $path = 'pickup_images/' . $imageName;
+
+                    $targetSize = 5120; // 5KB
+                    $quality = 70;
+                    ob_start();
+                    imagejpeg($compressed, null, $quality);
+                    $imageData = ob_get_clean();
+
+                    while (strlen($imageData) > $targetSize && $quality > 5) {
+                        $quality -= 5;
+                        ob_start();
+                        imagejpeg($compressed, null, $quality);
+                        $imageData = ob_get_clean();
+                    }
+
+                    Storage::disk('public')->put($path, $imageData);
+
+                    imagedestroy($source);
+                    imagedestroy($compressed);
+
+                    $paths[] = $path;
                 }
             }
+
             if (empty($paths)) {
                 return response()->json(['success' => false, 'message' => 'No valid image(s) provided.']);
             }
         }
         // ✅ Single base64 image
         elseif ($request->has('pickup_image') && is_string($request->pickup_image)) {
+
             $imageData = $request->pickup_image;
             $imageData = preg_replace('/^data:image\/\w+;base64,/', '', $imageData);
             $imageData = str_replace(' ', '+', $imageData);
-            $image = base64_decode($imageData);
-            if (!$image) {
-                return response()->json(['success' => false, 'message' => 'Invalid base64 image.']);
-            }
-            $imageName = 'pickup_image_' . time() . '.jpg';
+            $decoded = base64_decode($imageData);
+
+            $source = imagecreatefromstring($decoded);
+
+            $width = imagesx($source);
+            $height = imagesy($source);
+
+            $newWidth = 200;
+            $newHeight = floor($height * ($newWidth / $width));
+
+            $compressed = imagecreatetruecolor($newWidth, $newHeight);
+            imagecopyresampled($compressed, $source, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
+
+            $imageName = 'pickup_' . time() . '.jpg';
             $path = 'pickup_images/' . $imageName;
-            $path = preg_replace('~/{2,}~', '/', (string) $path);
-            $path = ltrim($path, '/');
-            Storage::disk('public')->put($path, $image);
+
+            $targetSize = 5120; // 5KB
+            $quality = 70;
+            ob_start();
+            imagejpeg($compressed, null, $quality);
+            $finalImage = ob_get_clean();
+
+            while (strlen($finalImage) > $targetSize && $quality > 5) {
+                $quality -= 5;
+                ob_start();
+                imagejpeg($compressed, null, $quality);
+                $finalImage = ob_get_clean();
+            }
+
+            Storage::disk('public')->put($path, $finalImage);
+
+            imagedestroy($source);
+            imagedestroy($compressed);
         }
         // ✅ Single file (backward compat)
         elseif ($request->hasFile('pickup_image') && $request->file('pickup_image')->isValid()) {
@@ -1980,30 +2050,103 @@ public function uploadDropImageUpdated(Request $request, $waybillId)
         if ($files && count($files) > 0) {
             foreach ($files as $file) {
                 if ($file->isValid()) {
-                    $stored = $file->store('drop_images', 'public');
-                    $stored = preg_replace('~/{2,}~', '/', (string) $stored);
-                    $stored = ltrim($stored, '/');
-                    $paths[] = $stored;
+
+                    $imageInfo = getimagesize($file);
+                    $mime = $imageInfo['mime'];
+
+                    switch ($mime) {
+                        case 'image/jpeg':
+                            $source = imagecreatefromjpeg($file);
+                            break;
+                        case 'image/png':
+                            $source = imagecreatefrompng($file);
+                            break;
+                        case 'image/gif':
+                            $source = imagecreatefromgif($file);
+                            break;
+                        default:
+                            continue 2;
+                    }
+
+                    $width = imagesx($source);
+                    $height = imagesy($source);
+
+                    $newWidth = 200;
+                    $newHeight = floor($height * ($newWidth / $width));
+
+                    $compressed = imagecreatetruecolor($newWidth, $newHeight);
+                    imagecopyresampled($compressed, $source, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
+
+                    $imageName = 'drop_' . time() . '_' . uniqid() . '.jpg';
+                    $path = 'drop_images/' . $imageName;
+
+                    $targetSize = 5120; // 5KB
+                    $quality = 70;
+
+                    ob_start();
+                    imagejpeg($compressed, null, $quality);
+                    $imageData = ob_get_clean();
+
+                    while (strlen($imageData) > $targetSize && $quality > 5) {
+                        $quality -= 5;
+                        ob_start();
+                        imagejpeg($compressed, null, $quality);
+                        $imageData = ob_get_clean();
+                    }
+
+                    Storage::disk('public')->put($path, $imageData);
+
+                    imagedestroy($source);
+                    imagedestroy($compressed);
+
+                    $paths[] = $path;
                 }
             }
+
             if (empty($paths)) {
                 return response()->json(['success' => false, 'message' => 'No valid image(s) provided.']);
             }
         }
         // ✅ Single base64 image
         elseif ($request->has('drop_image') && is_string($request->drop_image)) {
+
             $imageData = $request->drop_image;
             $imageData = preg_replace('/^data:image\/\w+;base64,/', '', $imageData);
             $imageData = str_replace(' ', '+', $imageData);
-            $image = base64_decode($imageData);
-            if (!$image) {
-                return response()->json(['success' => false, 'message' => 'Invalid base64 image.']);
-            }
-            $imageName = 'drop_image_' . time() . '.jpg';
+            $decoded = base64_decode($imageData);
+
+            $source = imagecreatefromstring($decoded);
+
+            $width = imagesx($source);
+            $height = imagesy($source);
+
+            $newWidth = 200;
+            $newHeight = floor($height * ($newWidth / $width));
+
+            $compressed = imagecreatetruecolor($newWidth, $newHeight);
+            imagecopyresampled($compressed, $source, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
+
+            $imageName = 'drop_' . time() . '.jpg';
             $path = 'drop_images/' . $imageName;
-            $path = preg_replace('~/{2,}~', '/', (string) $path);
-            $path = ltrim($path, '/');
-            Storage::disk('public')->put($path, $image);
+
+            $targetSize = 5120; // 5KB
+            $quality = 70;
+
+            ob_start();
+            imagejpeg($compressed, null, $quality);
+            $finalImage = ob_get_clean();
+
+            while (strlen($finalImage) > $targetSize && $quality > 5) {
+                $quality -= 5;
+                ob_start();
+                imagejpeg($compressed, null, $quality);
+                $finalImage = ob_get_clean();
+            }
+
+            Storage::disk('public')->put($path, $finalImage);
+
+            imagedestroy($source);
+            imagedestroy($compressed);
         }
         // ✅ Single file (backward compat)
         elseif ($request->hasFile('drop_image') && $request->file('drop_image')->isValid()) {
