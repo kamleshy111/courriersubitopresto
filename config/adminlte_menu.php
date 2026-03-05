@@ -257,11 +257,11 @@ return [
 
 
     [
-        'text'       => 'Votre compte',
-        'route'      => 'admin.account.index',
-        'icon'       => 'fas fa-fw fa-user',
-        'can'        => 'admin.permissions.index',
-//        'classes'    => 'bold-text',
+        'text'   => 'Votre compte',
+        'route'  => 'admin.account.index',
+        'icon'   => 'fas fa-fw fa-user',
+        // Visible for admin (admin.permissions.index) + client (admin.client.profile), hidden for drivers.
+        'can'    => ['admin.permissions.index', 'admin.client.profile'],
         'active' => ['admin/*'],
     ],
     
