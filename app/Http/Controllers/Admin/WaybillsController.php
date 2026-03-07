@@ -1742,14 +1742,26 @@ public function uploadPickupImageUpdated(Request $request, $waybillId)
 
                     switch ($mime) {
                         case 'image/jpeg':
+                        case 'image/jpg':
                             $source = imagecreatefromjpeg($file);
+                            $extension = 'jpg';
                             break;
+
                         case 'image/png':
                             $source = imagecreatefrompng($file);
+                            $extension = 'png';
                             break;
+
                         case 'image/gif':
                             $source = imagecreatefromgif($file);
+                            $extension = 'gif';
                             break;
+
+                        case 'image/webp':
+                            $source = imagecreatefromwebp($file);
+                            $extension = 'webp';
+                            break;
+
                         default:
                             continue 2;
                     }
@@ -1757,27 +1769,34 @@ public function uploadPickupImageUpdated(Request $request, $waybillId)
                     $width = imagesx($source);
                     $height = imagesy($source);
 
-                    $newWidth = 200;
-                    $newHeight = floor($height * ($newWidth / $width));
+                    $compressed = imagecreatetruecolor($width, $height);
+                    imagecopy($compressed, $source, 0, 0, 0, 0, $width, $height);
 
-                    $compressed = imagecreatetruecolor($newWidth, $newHeight);
-                    imagecopyresampled($compressed, $source, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
-
-                    $imageName = 'pickup_' . time() . '_' . uniqid() . '.jpg';
+                    $imageName = 'pickup_' . time() . '_' . uniqid() . '.' . $extension;
                     $path = 'pickup_images/' . $imageName;
 
                     $targetSize = 5120; // 5KB
-                    $quality = 70;
-                    ob_start();
-                    imagejpeg($compressed, null, $quality);
-                    $imageData = ob_get_clean();
+                    $quality = 90;
 
-                    while (strlen($imageData) > $targetSize && $quality > 5) {
-                        $quality -= 5;
+                    do {
+
                         ob_start();
-                        imagejpeg($compressed, null, $quality);
+
+                        if ($extension == 'png') {
+                            imagepng($compressed, null, 9);
+                        } elseif ($extension == 'gif') {
+                            imagegif($compressed);
+                        } elseif ($extension == 'webp') {
+                            imagewebp($compressed, null, $quality);
+                        } else {
+                            imagejpeg($compressed, null, $quality);
+                        }
+
                         $imageData = ob_get_clean();
-                    }
+
+                        $quality -= 5;
+
+                    } while (strlen($imageData) > $targetSize && $quality > 5);
 
                     Storage::disk('public')->put($path, $imageData);
 
@@ -1789,15 +1808,23 @@ public function uploadPickupImageUpdated(Request $request, $waybillId)
             }
 
             if (empty($paths)) {
-                return response()->json(['success' => false, 'message' => 'No valid image(s) provided.']);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No valid image(s) provided.'
+                ]);
             }
         }
-        // ✅ Single base64 image
+
         elseif ($request->has('pickup_image') && is_string($request->pickup_image)) {
 
             $imageData = $request->pickup_image;
+
+            preg_match('/^data:image\/(\w+);base64,/', $imageData, $type);
+            $extension = strtolower($type[1]);
+
             $imageData = preg_replace('/^data:image\/\w+;base64,/', '', $imageData);
             $imageData = str_replace(' ', '+', $imageData);
+
             $decoded = base64_decode($imageData);
 
             $source = imagecreatefromstring($decoded);
@@ -1805,27 +1832,34 @@ public function uploadPickupImageUpdated(Request $request, $waybillId)
             $width = imagesx($source);
             $height = imagesy($source);
 
-            $newWidth = 200;
-            $newHeight = floor($height * ($newWidth / $width));
+            $compressed = imagecreatetruecolor($width, $height);
+            imagecopy($compressed, $source, 0, 0, 0, 0, $width, $height);
 
-            $compressed = imagecreatetruecolor($newWidth, $newHeight);
-            imagecopyresampled($compressed, $source, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
-
-            $imageName = 'pickup_' . time() . '.jpg';
+            $imageName = 'pickup_' . time() . '.' . $extension;
             $path = 'pickup_images/' . $imageName;
 
-            $targetSize = 5120; // 5KB
-            $quality = 70;
-            ob_start();
-            imagejpeg($compressed, null, $quality);
-            $finalImage = ob_get_clean();
+            $targetSize = 5120;
+            $quality = 90;
 
-            while (strlen($finalImage) > $targetSize && $quality > 5) {
-                $quality -= 5;
+            do {
+
                 ob_start();
-                imagejpeg($compressed, null, $quality);
+
+                if ($extension == 'png') {
+                    imagepng($compressed, null, 9);
+                } elseif ($extension == 'webp') {
+                    imagewebp($compressed, null, $quality);
+                } elseif ($extension == 'gif') {
+                    imagegif($compressed);
+                } else {
+                    imagejpeg($compressed, null, $quality);
+                }
+
                 $finalImage = ob_get_clean();
-            }
+
+                $quality -= 5;
+
+            } while (strlen($finalImage) > $targetSize && $quality > 5);
 
             Storage::disk('public')->put($path, $finalImage);
 
@@ -2049,55 +2083,76 @@ public function uploadDropImageUpdated(Request $request, $waybillId)
         // ✅ Multiple files (drop_image[])
         if ($files && count($files) > 0) {
             foreach ($files as $file) {
+
                 if ($file->isValid()) {
 
                     $imageInfo = getimagesize($file);
                     $mime = $imageInfo['mime'];
 
                     switch ($mime) {
+
                         case 'image/jpeg':
+                        case 'image/jpg':
                             $source = imagecreatefromjpeg($file);
+                            $type = 'jpg';
                             break;
+
                         case 'image/png':
                             $source = imagecreatefrompng($file);
+                            $type = 'png';
                             break;
+
                         case 'image/gif':
                             $source = imagecreatefromgif($file);
+                            $type = 'gif';
                             break;
+
+                        case 'image/webp':
+                            $source = imagecreatefromwebp($file);
+                            $type = 'webp';
+                            break;
+
                         default:
                             continue 2;
                     }
 
-                    $width = imagesx($source);
-                    $height = imagesy($source);
-
-                    $newWidth = 200;
-                    $newHeight = floor($height * ($newWidth / $width));
-
-                    $compressed = imagecreatetruecolor($newWidth, $newHeight);
-                    imagecopyresampled($compressed, $source, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
-
-                    $imageName = 'drop_' . time() . '_' . uniqid() . '.jpg';
+                    $imageName = 'drop_' . time() . '_' . uniqid() . '.' . $type;
                     $path = 'drop_images/' . $imageName;
 
                     $targetSize = 5120; // 5KB
-                    $quality = 70;
+                    $quality = 90;
 
-                    ob_start();
-                    imagejpeg($compressed, null, $quality);
-                    $imageData = ob_get_clean();
+                    do {
 
-                    while (strlen($imageData) > $targetSize && $quality > 5) {
-                        $quality -= 5;
                         ob_start();
-                        imagejpeg($compressed, null, $quality);
+
+                        switch ($type) {
+
+                            case 'jpg':
+                                imagejpeg($source, null, $quality);
+                                break;
+
+                            case 'png':
+                                imagepng($source, null, 9);
+                                break;
+
+                            case 'gif':
+                                imagegif($source);
+                                break;
+
+                            case 'webp':
+                                imagewebp($source, null, $quality);
+                                break;
+                        }
+
                         $imageData = ob_get_clean();
-                    }
+                        $quality -= 5;
+
+                    } while (strlen($imageData) > $targetSize && $quality > 5);
 
                     Storage::disk('public')->put($path, $imageData);
 
                     imagedestroy($source);
-                    imagedestroy($compressed);
 
                     $paths[] = $path;
                 }
@@ -2111,6 +2166,10 @@ public function uploadDropImageUpdated(Request $request, $waybillId)
         elseif ($request->has('drop_image') && is_string($request->drop_image)) {
 
             $imageData = $request->drop_image;
+
+            preg_match('/^data:image\/(\w+);base64,/', $imageData, $type);
+            $imageType = strtolower($type[1]);
+
             $imageData = preg_replace('/^data:image\/\w+;base64,/', '', $imageData);
             $imageData = str_replace(' ', '+', $imageData);
             $decoded = base64_decode($imageData);
@@ -2120,28 +2179,28 @@ public function uploadDropImageUpdated(Request $request, $waybillId)
             $width = imagesx($source);
             $height = imagesy($source);
 
-            $newWidth = 200;
-            $newHeight = floor($height * ($newWidth / $width));
-
-            $compressed = imagecreatetruecolor($newWidth, $newHeight);
-            imagecopyresampled($compressed, $source, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
-
-            $imageName = 'drop_' . time() . '.jpg';
-            $path = 'drop_images/' . $imageName;
+            $compressed = imagecreatetruecolor($width, $height);
+            imagecopy($compressed, $source, 0, 0, 0, 0, $width, $height);
 
             $targetSize = 5120; // 5KB
-            $quality = 70;
+            $quality = 90;
 
-            ob_start();
-            imagejpeg($compressed, null, $quality);
-            $finalImage = ob_get_clean();
+            $imageName = 'drop_' . time() . '.' . $imageType;
+            $path = 'drop_images/' . $imageName;
 
-            while (strlen($finalImage) > $targetSize && $quality > 5) {
-                $quality -= 5;
+            do {
                 ob_start();
-                imagejpeg($compressed, null, $quality);
+
+                if ($imageType == 'png') {
+                    imagepng($compressed, null, 9);
+                } else {
+                    imagejpeg($compressed, null, $quality);
+                }
+
                 $finalImage = ob_get_clean();
-            }
+                $quality -= 5;
+
+            } while (strlen($finalImage) > $targetSize && $quality > 5);
 
             Storage::disk('public')->put($path, $finalImage);
 

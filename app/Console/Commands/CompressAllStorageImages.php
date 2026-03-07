@@ -29,15 +29,37 @@ class CompressAllStorageImages extends Command
             $filePath = $file->getPathname();
             $extension = strtolower($file->getExtension());
 
-            // if (!in_array($extension, ['jpg', 'jpeg'])) continue;
-
             $currentSize = filesize($filePath);
-            if ($currentSize <= $targetSize) continue;
+            if ($currentSize <= 20480) {
+                continue;
+            }
 
-            $source = imagecreatefromjpeg($filePath);
+            switch ($extension) {
+
+                case 'jpg':
+                case 'jpeg':
+                    $source = @imagecreatefromjpeg($filePath);
+                    break;
+
+                case 'png':
+                    $source = @imagecreatefrompng($filePath);
+                    break;
+
+                case 'gif':
+                    $source = @imagecreatefromgif($filePath);
+                    break;
+
+                case 'webp':
+                    $source = @imagecreatefromwebp($filePath);
+                    break;
+
+                default:
+                    continue 2;
+            }
+
             if (!$source) continue;
 
-            $quality = 70;
+            $quality = 90;
 
             do {
                 ob_start();
